@@ -1,0 +1,14 @@
+# Node
+node_modules
+**/node_modules
+
+# Output
+dist
+build
+
+# Env
+*.env
+.env.*
+
+# OS
+.DS_Store
