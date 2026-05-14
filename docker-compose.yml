@@ -14,7 +14,7 @@ services:
       - "3001:3001"
     depends_on:
       - postgres
-    command: sh -c "npx prisma migrate deploy && node dist/main"
+    command: sh -c "npx prisma migrate deploy && npx prisma db seed && node dist/main"
 
   frontend:
     build:

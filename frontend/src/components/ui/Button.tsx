@@ -22,10 +22,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       "inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-sky-400 disabled:cursor-not-allowed disabled:opacity-60";
 
     const variantStyles = {
-      primary: "bg-sky-500 text-white hover:bg-sky-400",
+      primary: "bg-brand-primary text-white hover:bg-brand-primary/90 shadow-md shadow-brand-primary/20",
       secondary:
-        "border border-slate-700 bg-slate-800 text-slate-100 hover:bg-slate-700",
-      danger: "bg-rose-600 text-white hover:bg-rose-500",
+        "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 shadow-sm",
+      danger: "bg-rose-500 text-white hover:bg-rose-600 shadow-md shadow-rose-500/20",
     };
 
     return (

@@ -1,34 +1,50 @@
 @import "tailwindcss";
 
+@theme {
+  --color-brand-primary: #76939b;
+  --color-brand-secondary: #d4af37;
+  --color-brand-dark: #1e293b;
+  --color-bg-main: #f8fafc;
+}
+
 :root {
-  color-scheme: dark;
+  --brand-primary: #76939b;
+  --brand-secondary: #d4af37;
+  --brand-dark: #1e293b;
+  --bg-main: #f8fafc;
+  
+  --foreground-rgb: 30, 41, 59;
+  --background-start-rgb: 248, 250, 252;
+  --background-end-rgb: 255, 255, 255;
 }
 
 @layer base {
   body {
     min-height: 100vh;
-    background-color: #0f172a;
-    color: #f8fafc;
-    font-family:
-      ui-sans-serif,
-      system-ui,
-      -apple-system,
-      BlinkMacSystemFont,
-      "Segoe UI",
-      sans-serif;
+    background-color: var(--bg-main);
+    color: rgb(var(--foreground-rgb));
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  input,
-  button,
-  textarea,
-  select {
-    font: inherit;
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--brand-dark);
+    font-weight: 600;
+  }
+}
+
+@layer components {
+  .glass-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   }
 
-  a {
-    color: inherit;
-    text-decoration: none;
+  .sidebar-link-active {
+    background-color: rgba(118, 147, 155, 0.1);
+    color: var(--brand-primary);
+    border-right: 3px solid var(--brand-primary);
   }
 }

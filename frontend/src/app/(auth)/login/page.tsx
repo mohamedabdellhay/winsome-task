@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { api } from "@/lib/api";
-import { setToken } from "@/lib/auth";
+import { setToken, setUser } from "@/lib/auth";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
@@ -37,6 +38,7 @@ export default function LoginPage() {
     try {
       const response = await api.post("/auth/login", values);
       setToken(response.data.accessToken);
+      setUser(response.data.user);
       router.push("/dashboard");
     } catch (err: any) {
       setError(err?.response?.data?.message || "Login failed");
@@ -46,10 +48,10 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md rounded-3xl border border-slate-800 bg-slate-900/90 p-8 shadow-xl shadow-slate-950/50">
-        <h1 className="text-3xl font-semibold text-white">Login</h1>
-        <p className="mt-2 text-slate-400">
+    <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10">
+      <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/50">
+        <h1 className="text-3xl font-bold text-slate-900">Login</h1>
+        <p className="mt-2 text-slate-500">
           Access your hotel booking dashboard.
         </p>
 
@@ -79,14 +81,14 @@ export default function LoginPage() {
           </Button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-slate-400">
+        <p className="mt-6 text-center text-sm text-slate-500">
           Don&apos;t have an account?{" "}
-          <a
+          <Link
             href="/register"
-            className="font-medium text-sky-400 hover:text-sky-300"
+            className="font-medium text-brand-primary hover:text-brand-primary/80"
           >
             Register
-          </a>
+          </Link>
         </p>
       </div>
     </main>

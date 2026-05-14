@@ -1,14 +1,24 @@
-import "./globals.css";
-import type { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Dashboard | Winsome Hotel Booking",
-};
+import { AdminLayout } from "@/components/layouts/AdminLayout";
+import { UserLayout } from "@/components/layouts/UserLayout";
+import { isAdmin } from "@/lib/auth";
+import { useEffect, useState } from "react";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  const [admin, setAdmin] = useState(false);
+
+  useEffect(() => {
+    setAdmin(isAdmin());
+  }, []);
+
+  if (admin) {
+    return <AdminLayout>{children}</AdminLayout>;
+  }
+
+  return <UserLayout>{children}</UserLayout>;
 }

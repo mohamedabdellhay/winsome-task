@@ -1,31 +1,36 @@
 import Link from "next/link";
+import { UserLayout } from "@/components/layouts/UserLayout";
 
 export default function HomePage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-6 px-4 text-center">
-      <div className="max-w-2xl rounded-3xl border border-slate-800 bg-slate-900/80 p-10 shadow-2xl shadow-slate-950/40">
-        <h1 className="text-4xl font-semibold text-white">
-          Winsome Hotel Booking
-        </h1>
-        <p className="mt-4 text-slate-300">
-          A production-style hotel booking system with authentication and
-          booking management.
-        </p>
-        <div className="mt-8 flex flex-wrap justify-center gap-4">
-          <Link
-            href="/login"
-            className="rounded-full bg-sky-500 px-6 py-3 text-white transition hover:bg-sky-400"
-          >
-            Login
-          </Link>
-          <Link
-            href="/register"
-            className="rounded-full border border-slate-700 px-6 py-3 text-slate-100 transition hover:border-slate-500"
-          >
-            Register
-          </Link>
+    <UserLayout>
+      <div className="relative overflow-hidden bg-white py-24 sm:py-32">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <h1 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-6xl">
+              Discover the Art of <span className="text-brand-primary">Luxury Booking</span>
+            </h1>
+            <p className="mt-6 text-lg leading-8 text-slate-600">
+              Experience unparalleled hospitality and world-class services at your fingertips. 
+              Find your perfect stay with Winsome.
+            </p>
+            <div className="mt-10 flex items-center justify-center gap-x-6">
+              <Link
+                href="/register"
+                className="rounded-full bg-brand-primary px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-brand-primary/20 hover:bg-brand-primary/90 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary"
+              >
+                Get Started
+              </Link>
+              <Link href="/hotels" className="text-sm font-semibold leading-6 text-slate-900">
+                Explore Hotels <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+          </div>
         </div>
+        
+        {/* Background Decorative Element */}
+        <div className="absolute top-0 -z-10 h-full w-full bg-[radial-gradient(circle_at_top_right,_var(--brand-primary)_0%,_transparent_25%)] opacity-5"></div>
       </div>
-    </main>
+    </UserLayout>
   );
 }
