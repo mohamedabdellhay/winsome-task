@@ -33,7 +33,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  managedHotels Hotel[]
+  managedHotel  Hotel?
   bookings      Booking[]
 }
 
@@ -47,11 +47,14 @@ model Hotel {
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 
-  manager   User?   @relation(fields: [managerId], references: [id])
-  managerId String?
+  manager   User   @relation(fields: [managerId], references: [id])
+  managerId String @unique
 
   rooms    Room[]
   bookings Booking[]
+
+  @@index([name])
+  @@index([city])
 }
 
 model Room {

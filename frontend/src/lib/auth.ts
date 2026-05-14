@@ -49,3 +49,13 @@ export const isAdmin = () => {
   const user = getUser();
   return user?.role === "ADMIN";
 };
+
+export const isManager = () => {
+  const user = getUser();
+  return user?.role === "HOTEL_MANAGER";
+};
+
+export const isStaff = () => {
+  const user = getUser();
+  return user?.role === "ADMIN" || user?.role === "HOTEL_MANAGER";
+};

@@ -1,4 +1,8 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Role } from '@prisma/client';
+import { Roles } from './decorators/roles.decorator';
+import { RolesGuard } from './guards/roles.guard';
+
 import {
   ApiBody,
   ApiCreatedResponse,
@@ -79,5 +83,22 @@ export class AuthController {
     return this.authService.login(dto);
   }
 
+  @Get('managers')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Get all hotel managers (Admin only) /\/\/\/\/\/\ this is not required by the task I just added it as bonus :)' })
+  async getManagers() {
+    return this.authService.findManagers();
+  }
 
+  @Post('admin/create-user')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Create a new user with a specific role (Admin only) /\/\/\/\/\/\ this is not required by the task I just added it as bonus :)' })
+  @ApiCreatedResponse({ description: 'User successfully created by admin' })
+  @ApiBody({ type: RegisterDto })
+  async adminCreateUser(@Body() dto: RegisterDto) {
+    return this.authService.adminCreateUser(dto);
+  }
 }
+

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ReactNode, useEffect, useState } from "react";
-import { clearToken, getUser } from "@/lib/auth";
+import { clearToken, getUser, isAdmin } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 
 interface AdminLayoutProps {
@@ -12,9 +12,11 @@ interface AdminLayoutProps {
 export const AdminLayout = ({ children }: AdminLayoutProps) => {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
+  const [admin, setAdmin] = useState(false);
 
   useEffect(() => {
     setUser(getUser());
+    setAdmin(isAdmin());
   }, []);
 
   const handleLogout = () => {
@@ -54,18 +56,22 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
           >
             Bookings
           </Link>
-          <Link 
-            href="/dashboard/users" 
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
-          >
-            Users
-          </Link>
-          <Link 
-            href="/dashboard/settings" 
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
-          >
-            Settings
-          </Link>
+          {admin && (
+            <>
+              <Link 
+                href="/dashboard/users" 
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
+              >
+                Users
+              </Link>
+              <Link 
+                href="/dashboard/settings" 
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
+              >
+                Settings
+              </Link>
+            </>
+          )}
         </nav>
       </aside>
 
@@ -73,7 +79,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
       <div className="flex flex-1 flex-col">
         {/* Header */}
         <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-8">
-          <h2 className="text-lg font-semibold text-brand-dark">Dashboard Overview</h2>
+          <h2 className="text-lg font-semibold text-brand-dark"></h2>
           <div className="flex items-center gap-4">
             <div className="flex flex-col items-end mr-2">
               <span className="text-sm font-semibold text-slate-900">{user?.name || "Admin User"}</span>

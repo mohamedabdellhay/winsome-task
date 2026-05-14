@@ -2,7 +2,7 @@
 
 import { AdminLayout } from "@/components/layouts/AdminLayout";
 import { UserLayout } from "@/components/layouts/UserLayout";
-import { isAdmin } from "@/lib/auth";
+import { isStaff } from "@/lib/auth";
 import { useEffect, useState } from "react";
 
 export default function DashboardLayout({
@@ -10,13 +10,13 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [admin, setAdmin] = useState(false);
+  const [isStaffMember, setIsStaffMember] = useState(false);
 
   useEffect(() => {
-    setAdmin(isAdmin());
+    setIsStaffMember(isStaff());
   }, []);
 
-  if (admin) {
+  if (isStaffMember) {
     return <AdminLayout>{children}</AdminLayout>;
   }
 

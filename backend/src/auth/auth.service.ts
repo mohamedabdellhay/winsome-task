@@ -86,4 +86,43 @@ export class AuthService {
     });
     return user || null;
   }
+
+  async findManagers() {
+    return this.prisma.user.findMany({
+      where: { 
+        role: Role.HOTEL_MANAGER,
+        managedHotel: null,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+      },
+    });
+  }
+
+  async adminCreateUser(dto: RegisterDto) {
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
+    if (existingUser) {
+      throw new ConflictException("Email is already registered");
+    }
+
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+    const user = await this.prisma.user.create({
+      data: {
+        name: dto.name,
+        email: dto.email,
+        password: hashedPassword,
+        role: dto.role ?? Role.USER,
+      },
+    });
+
+    return {
+      user: this.sanitizeUser(user),
+      message: "User created successfully by admin",
+    };
+  }
 }
