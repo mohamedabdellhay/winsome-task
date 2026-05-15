@@ -25,11 +25,10 @@ export default function RoomsManagementPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const limit = 10;
-  const user = getUser();
-  const [roomToDelete, setRoomToDelete] = useState<string | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
+    setUser(getUser());
     const fetchRooms = async () => {
       try {
         const response = await api.get(`/rooms?page=${page}&limit=${limit}`);
@@ -44,21 +43,6 @@ export default function RoomsManagementPage() {
 
     fetchRooms();
   }, [page]);
-
-  const handleDelete = async () => {
-    if (!roomToDelete) return;
-    setIsDeleting(true);
-    try {
-      await api.delete(`/rooms/${roomToDelete}`);
-      setRooms(rooms.filter((r) => r.id !== roomToDelete));
-      setRoomToDelete(null);
-    } catch (error) {
-      console.error("Failed to delete room:", error);
-      alert("Failed to delete room.");
-    } finally {
-      setIsDeleting(false);
-    }
-  };
 
   return (
     <div className="space-y-6">
@@ -111,12 +95,6 @@ export default function RoomsManagementPage() {
                     <Link href={`/dashboard/rooms/${room.id}`} className="text-brand-primary font-semibold text-sm hover:underline">
                       Edit
                     </Link>
-                    <button 
-                      onClick={() => setRoomToDelete(room.id)}
-                      className="text-red-500 font-semibold text-sm hover:underline"
-                    >
-                      Delete
-                    </button>
                   </td>
                 </tr>
               ))}
@@ -150,43 +128,6 @@ export default function RoomsManagementPage() {
           </div>
         )}
       </div>
-
-      {/* Tailwind Custom Modal for Delete Confirmation */}
-      {roomToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            <div className="p-6 text-center space-y-4">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
-                <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-slate-900">Delete Room</h3>
-                <p className="text-sm text-slate-500 mt-2">
-                  Are you sure you want to delete this room? This action cannot be undone.
-                </p>
-              </div>
-            </div>
-            <div className="bg-slate-50 px-6 py-4 flex gap-3 justify-end rounded-b-2xl">
-              <Button 
-                variant="secondary" 
-                onClick={() => setRoomToDelete(null)}
-                disabled={isDeleting}
-              >
-                Cancel
-              </Button>
-              <Button 
-                className="bg-red-600 hover:bg-red-700" 
-                onClick={handleDelete}
-                isLoading={isDeleting}
-              >
-                Delete Room
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -152,15 +152,4 @@ export class RoomsController {
     return this.roomsService.update(id, updateRoomDto, user);
   }
 
-  @Delete(':id')
-  @Roles(Role.ADMIN, Role.HOTEL_MANAGER)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Delete a room', description: 'Allows an administrator or a hotel manager to delete a room. Managers are restricted to rooms in their assigned hotel.' })
-  @ApiNoContentResponse({ description: 'The room has been successfully deleted.' })
-  @ApiForbiddenResponse({ description: 'Forbidden. Requires Admin or Hotel Manager role.' })
-  @ApiNotFoundResponse({ description: 'Room not found.' })
-  @ApiInternalServerErrorResponse({ description: 'Failed to delete room.' })
-  remove(@Param('id') id: string, @GetUser() user: any) {
-    return this.roomsService.remove(id, user);
-  }
 }

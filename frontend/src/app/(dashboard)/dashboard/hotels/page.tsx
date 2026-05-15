@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { isAdmin } from "@/lib/auth";
+import { isAdmin as checkIsAdmin } from "@/lib/auth";
 
 interface Hotel {
   id: string;
@@ -20,6 +21,7 @@ interface Hotel {
 }
 
 export default function AdminHotelsPage() {
+  const router = useRouter();
   const [hotels, setHotels] = useState<Hotel[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isUserAdmin, setIsUserAdmin] = useState(false);
@@ -55,8 +57,12 @@ export default function AdminHotelsPage() {
   }, [searchQuery]);
 
   useEffect(() => {
-    setIsUserAdmin(isAdmin());
-  }, []);
+    const adminStatus = checkIsAdmin();
+    setIsUserAdmin(adminStatus);
+    if (!adminStatus) {
+      router.push("/dashboard");
+    }
+  }, [router]);
 
   useEffect(() => {
     const fetchHotels = async () => {

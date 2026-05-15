@@ -30,8 +30,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
       success: false,
       statusCode: status,
       message:
-        status === HttpStatus.BAD_REQUEST
-          ? "Validation failed"
+        status === HttpStatus.BAD_REQUEST && errors.length > 0
+          ? errors[0]
           : exception.message,
       errors,
     });

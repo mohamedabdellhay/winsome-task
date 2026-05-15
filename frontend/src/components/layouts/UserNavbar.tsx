@@ -2,20 +2,23 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { clearToken, isLoggedIn } from "@/lib/auth";
+import { clearToken, isLoggedIn, isStaff } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 
 export const UserNavbar = () => {
   const router = useRouter();
   const [isAuth, setIsAuth] = useState(false);
+  const [staff, setStaff] = useState(false);
 
   useEffect(() => {
     setIsAuth(isLoggedIn());
+    setStaff(isStaff());
   }, []);
 
   const handleLogout = () => {
     clearToken();
     setIsAuth(false);
+    setStaff(false);
     router.push("/login");
   };
 
@@ -23,18 +26,14 @@ export const UserNavbar = () => {
     <div className="flex items-center gap-4">
       {isAuth ? (
         <>
-          <Link 
-            href="/bookings" 
-            className="text-sm font-medium text-slate-600 hover:text-brand-primary"
-          >
-            My Bookings
-          </Link>
-          <Link 
-            href="/dashboard" 
-            className="text-sm font-medium text-slate-600 hover:text-brand-primary"
-          >
-            Dashboard
-          </Link>
+          {staff && (
+            <Link 
+              href="/dashboard" 
+              className="text-sm font-medium text-slate-600 hover:text-brand-primary"
+            >
+              Dashboard
+            </Link>
+          )}
           <button 
             onClick={handleLogout}
             className="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"

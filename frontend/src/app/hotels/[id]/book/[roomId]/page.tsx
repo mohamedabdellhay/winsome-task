@@ -91,8 +91,24 @@ export default function BookingPage({ params }: { params: Promise<{ id: string; 
       });
       router.push("/bookings");
     } catch (err: any) {
-      const message = err.response?.data?.message || "Failed to create booking. Please check your details.";
-      setError(Array.isArray(message) ? message[0] : message);
+      console.error("Booking submission error:", err);
+      const data = err.response?.data;
+      
+      let errorMsg = "An unexpected error occurred. Please try again.";
+      
+      if (data) {
+        if (Array.isArray(data.errors) && data.errors.length > 0) {
+          errorMsg = data.errors.join(". ");
+        } else if (typeof data.message === "string") {
+          errorMsg = data.message;
+        } else if (Array.isArray(data.message)) {
+          errorMsg = data.message[0];
+        } else if (data.error) {
+          errorMsg = data.error;
+        }
+      }
+      
+      setError(errorMsg);
     } finally {
       setIsSubmitting(false);
     }
@@ -178,8 +194,14 @@ export default function BookingPage({ params }: { params: Promise<{ id: string; 
                     </div>
 
                     {error && (
-                      <div className="p-4 bg-rose-50 border border-rose-100 text-rose-600 rounded-xl text-sm font-medium">
-                        {error}
+                      <div className="p-4 bg-rose-50 border border-rose-100 text-rose-600 rounded-2xl flex items-start gap-3 animate-in shake duration-500">
+                        <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div>
+                          <p className="text-sm font-bold">Booking Error</p>
+                          <p className="text-xs mt-1 opacity-90">{error}</p>
+                        </div>
                       </div>
                     )}
 
@@ -235,7 +257,9 @@ export default function BookingPage({ params }: { params: Promise<{ id: string; 
                   </div>
 
                   <div className="bg-emerald-50 p-4 rounded-2xl flex items-start gap-3">
-                    <span className="text-emerald-600 mt-0.5">✨</span>
+                    <svg className="w-5 h-5 text-emerald-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.286-6.857L1 12l7.714-2.143L11 3z" />
+                    </svg>
                     <p className="text-xs text-emerald-800 leading-relaxed">
                       Your booking includes complimentary breakfast and high-speed Wi-Fi.
                     </p>

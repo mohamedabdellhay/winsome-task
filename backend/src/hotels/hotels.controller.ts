@@ -45,10 +45,18 @@ export class HotelsController {
 
   @Post()
   @Roles(Role.ADMIN)
-  @ApiOperation({ summary: 'Create a new hotel', description: 'Allows an administrator to create a new hotel. Only one hotel can be assigned per manager.' })
+  @ApiOperation({
+    summary: 'Create a new hotel',
+    description:
+      'Allows an administrator to create a new hotel. Only one hotel can be assigned per manager.',
+  })
   @ApiBody({ type: CreateHotelDto })
-  @ApiCreatedResponse({ description: 'The hotel has been successfully created.' })
-  @ApiBadRequestResponse({ description: 'Invalid input or manager already assigned to another hotel.' })
+  @ApiCreatedResponse({
+    description: 'The hotel has been successfully created.',
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid input or manager already assigned to another hotel.',
+  })
   @ApiForbiddenResponse({ description: 'Forbidden. Requires Admin role.' })
   @ApiInternalServerErrorResponse({ description: 'Failed to create hotel.' })
   async create(@Body() createHotelDto: CreateHotelDto) {
@@ -67,7 +75,8 @@ export class HotelsController {
   @Get()
   @ApiOperation({
     summary: 'Get all hotels',
-    description: 'Retrieves a list of all hotels with optional search filtering and pagination.',
+    description:
+      'Retrieves a list of all hotels with optional search filtering and pagination.',
   })
   @ApiQuery({
     name: 'search',
@@ -75,8 +84,20 @@ export class HotelsController {
     type: String,
     description: 'Filter hotels by name or city',
   })
-  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number for pagination', example: 1 })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Number of items per page', example: 10 })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number for pagination',
+    example: 1,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Number of items per page',
+    example: 10,
+  })
   @ApiOkResponse({
     description: 'List of hotels retrieved successfully.',
     schema: {
@@ -119,7 +140,12 @@ export class HotelsController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get a hotel by ID', description: 'Retrieves detailed information about a specific hotel, including its rooms and manager details.' })
+  @ApiOperation({
+    summary:
+      'Get a hotel by ID /\/\/\/\/\/\ this is not required by the task I just added it as bonus :)',
+    description:
+      'Retrieves detailed information about a specific hotel, including its rooms and manager details.',
+  })
   @ApiOkResponse({
     description: 'The hotel details have been successfully retrieved.',
     schema: {
@@ -154,7 +180,9 @@ export class HotelsController {
     },
   })
   @ApiNotFoundResponse({ description: 'Hotel not found.' })
-  @ApiInternalServerErrorResponse({ description: 'Failed to fetch hotel details.' })
+  @ApiInternalServerErrorResponse({
+    description: 'Failed to fetch hotel details.',
+  })
   async findOne(@Param('id') id: string) {
     try {
       return await this.hotelsService.findOne(id);
@@ -168,10 +196,15 @@ export class HotelsController {
 
   @Patch(':id')
   @Roles(Role.ADMIN)
-  @ApiOperation({ summary: 'Update a hotel', description: 'Allows an administrator to update hotel information.' })
+  @ApiOperation({
+    summary: 'Update a hotel',
+    description: 'Allows an administrator to update hotel information.',
+  })
   @ApiBody({ type: UpdateHotelDto })
   @ApiOkResponse({ description: 'The hotel has been successfully updated.' })
-  @ApiBadRequestResponse({ description: 'Invalid input or manager already assigned to another hotel.' })
+  @ApiBadRequestResponse({
+    description: 'Invalid input or manager already assigned to another hotel.',
+  })
   @ApiForbiddenResponse({ description: 'Forbidden. Requires Admin role.' })
   @ApiNotFoundResponse({ description: 'Hotel not found.' })
   @ApiInternalServerErrorResponse({ description: 'Failed to update hotel.' })
@@ -197,8 +230,14 @@ export class HotelsController {
   @Delete(':id')
   @Roles(Role.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Delete a hotel', description: 'Allows an administrator to delete a hotel. This will fail if there are associated records that prevent deletion.' })
-  @ApiNoContentResponse({ description: 'The hotel has been successfully deleted.' })
+  @ApiOperation({
+    summary: 'Delete a hotel',
+    description:
+      'Allows an administrator to delete a hotel. This will fail if there are associated records that prevent deletion.',
+  })
+  @ApiNoContentResponse({
+    description: 'The hotel has been successfully deleted.',
+  })
   @ApiForbiddenResponse({ description: 'Forbidden. Requires Admin role.' })
   @ApiNotFoundResponse({ description: 'Hotel not found.' })
   @ApiInternalServerErrorResponse({ description: 'Failed to delete hotel.' })

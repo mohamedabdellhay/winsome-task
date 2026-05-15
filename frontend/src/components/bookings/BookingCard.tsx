@@ -17,11 +17,16 @@ interface BookingCardProps {
     room: {
       type: string;
     };
+    user?: {
+      name: string;
+      email: string;
+    };
   };
-  onCancel?: (id: string) => void;
+  onStatusUpdate?: (id: string, status: BookingStatus) => void;
+  isAdmin?: boolean;
 }
 
-export const BookingCard: React.FC<BookingCardProps> = ({ booking, onCancel }) => {
+export const BookingCard: React.FC<BookingCardProps> = ({ booking, onStatusUpdate, isAdmin }) => {
   const statusColors = {
     PENDING: "bg-amber-100 text-amber-700 border-amber-200",
     CONFIRMED: "bg-emerald-100 text-emerald-700 border-emerald-200",
@@ -47,13 +52,24 @@ export const BookingCard: React.FC<BookingCardProps> = ({ booking, onCancel }) =
           <div>
             <h3 className="text-xl font-bold text-slate-900">{booking.hotel.name}</h3>
             <p className="text-slate-500 text-sm flex items-center gap-1">
-              <span>📍</span> {booking.hotel.city}
+              <svg className="w-4 h-4 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              {booking.hotel.city}
             </p>
           </div>
           <span className={`px-3 py-1 rounded-full text-xs font-bold border ${statusColors[booking.status]}`}>
             {booking.status}
           </span>
         </div>
+
+        {isAdmin && booking.user && (
+          <div className="mb-4 p-3 bg-slate-50 rounded-xl border border-slate-100">
+            <p className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">Booked By</p>
+            <p className="text-sm font-semibold text-slate-700">{booking.user.name} ({booking.user.email})</p>
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-4 py-4 border-y border-slate-50">
           <div>
@@ -72,14 +88,26 @@ export const BookingCard: React.FC<BookingCardProps> = ({ booking, onCancel }) =
             <p className="text-xl font-extrabold text-brand-dark">${parseFloat(booking.totalPrice).toFixed(2)}</p>
           </div>
           
-          {booking.status === "PENDING" && onCancel && (
-            <button
-              onClick={() => onCancel(booking.id)}
-              className="text-rose-500 hover:text-rose-600 text-sm font-bold hover:underline transition-all"
-            >
-              Cancel Booking
-            </button>
-          )}
+          <div className="flex gap-4">
+            {booking.status === "PENDING" && onStatusUpdate && (
+              <>
+                {isAdmin && (
+                  <button
+                    onClick={() => onStatusUpdate(booking.id, "CONFIRMED")}
+                    className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-lg shadow-emerald-500/20"
+                  >
+                    Confirm Booking
+                  </button>
+                )}
+                <button
+                  onClick={() => onStatusUpdate(booking.id, "CANCELLED")}
+                  className="text-rose-500 hover:text-rose-600 text-sm font-bold hover:underline transition-all"
+                >
+                  Cancel
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>

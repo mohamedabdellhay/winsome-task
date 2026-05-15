@@ -44,12 +44,14 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
           >
             Dashboard
           </Link>
-          <Link 
-            href="/dashboard/hotels" 
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
-          >
-            Hotels
-          </Link>
+          {admin && (
+            <Link 
+              href="/dashboard/hotels" 
+              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
+            >
+              Hotels
+            </Link>
+          )}
           <Link 
             href="/dashboard/bookings" 
             className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
@@ -62,22 +64,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
           >
             Rooms
           </Link>
-          {admin && (
-            <>
-              <Link 
-                href="/dashboard/users" 
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
-              >
-                Users
-              </Link>
-              <Link 
-                href="/dashboard/settings" 
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
-              >
-                Settings
-              </Link>
-            </>
-          )}
+        
         </nav>
       </aside>
 

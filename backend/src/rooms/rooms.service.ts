@@ -69,14 +69,6 @@ export class RoomsService {
     });
   }
 
-  async remove(id: string, user: any) {
-    const room = await this.findOne(id);
-    await this.verifyManagerAccess(room.hotelId, user);
-    
-    return this.prisma.room.delete({
-      where: { id },
-    });
-  }
 
   async verifyManagerAccess(hotelId: string, user: any) {
     if (user.role === Role.ADMIN) return true;

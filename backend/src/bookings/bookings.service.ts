@@ -91,6 +91,13 @@ export class BookingsService {
       });
     }
 
+    if (user.role === Role.HOTEL_MANAGER) {
+      return this.prisma.booking.findMany({
+        where: { hotel: { managerId: user.id } },
+        include: { hotel: true, room: true, user: true },
+      });
+    }
+
     return this.prisma.booking.findMany({
       where: { userId: user.id },
       include: { hotel: true, room: true },
@@ -107,7 +114,13 @@ export class BookingsService {
       throw new NotFoundException('Booking not found.');
     }
 
-    if (user.role !== Role.ADMIN && booking.userId !== user.id) {
+    if (user.role === Role.ADMIN) return booking;
+    
+    if (user.role === Role.HOTEL_MANAGER && booking.hotel.managerId === user.id) {
+      return booking;
+    }
+
+    if (booking.userId !== user.id) {
       throw new ForbiddenException('You do not have permission to view this booking.');
     }
 
@@ -117,8 +130,12 @@ export class BookingsService {
   async updateStatus(id: string, status: BookingStatus, user: any) {
     const booking = await this.findOne(id, user);
 
-    // Only Admin or the User who created the booking (if cancelling)
-    if (user.role !== Role.ADMIN && booking.userId !== user.id) {
+    // Permission check
+    const isOwner = booking.userId === user.id;
+    const isHotelManager = user.role === Role.HOTEL_MANAGER && booking.hotel.managerId === user.id;
+    const isAdmin = user.role === Role.ADMIN;
+
+    if (!isAdmin && !isHotelManager && !isOwner) {
       throw new ForbiddenException('Permission denied.');
     }
 

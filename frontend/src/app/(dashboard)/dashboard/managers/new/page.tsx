@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,6 +8,7 @@ import * as z from "zod";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { isAdmin as checkIsAdmin } from "@/lib/auth";
 
 const managerSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
@@ -22,6 +23,12 @@ export default function CreateManagerPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!checkIsAdmin()) {
+      router.push("/dashboard");
+    }
+  }, [router]);
 
   const {
     register,
