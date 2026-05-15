@@ -3,18 +3,20 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api";
-import { UserLayout } from "@/components/layouts/UserLayout";
 import { BookingCard } from "@/components/bookings/BookingCard";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { isAdmin as checkIsAdmin } from "@/lib/auth";
 import { useToast } from "@/components/ui/Toast";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { BookingStatus } from "@/types/booking";
+import { Pagination } from "@/components/ui/Pagination";
 
 export default function MyBookingsPage() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [isAdmin, setIsAdmin] = useState(false);
   const { showToast } = useToast();
 
@@ -22,10 +24,14 @@ export default function MyBookingsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<{ id: string, status: BookingStatus } | null>(null);
 
-  const fetchBookings = async () => {
+  const fetchBookings = async (currentPage: number) => {
+    setIsLoading(true);
     try {
-      const response = await api.get("/bookings");
+      const response = await api.get("/bookings", { params: { page: currentPage, limit: 10 } });
       setBookings(response.data.data ?? response.data);
+      if (response.data.meta) {
+        setTotalPages(response.data.meta.totalPages);
+      }
     } catch (err) {
       console.error("Failed to fetch bookings:", err);
       setError("Failed to load bookings. Please try again later.");
@@ -36,8 +42,8 @@ export default function MyBookingsPage() {
 
   useEffect(() => {
     setIsAdmin(checkIsAdmin());
-    fetchBookings();
-  }, []);
+    fetchBookings(page);
+  }, [page]);
 
   const handleStatusUpdate = (id: string, status: BookingStatus) => {
     setSelectedBooking({ id, status });
@@ -77,16 +83,16 @@ export default function MyBookingsPage() {
 
   if (isLoading) {
     return (
-      <UserLayout>
+      <>
         <div className="flex justify-center items-center h-[calc(100vh-64px)] bg-slate-50">
           <LoadingSpinner />
         </div>
-      </UserLayout>
+      </>
     );
   }
 
   return (
-    <UserLayout>
+    <>
       <div className="bg-slate-50 min-h-[calc(100vh-64px)] py-12">
         <div className="w-full mx-auto px-4">
           <div className="flex justify-between items-center mb-10">
@@ -128,7 +134,7 @@ export default function MyBookingsPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-6">
-              {bookings.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((booking) => (
+              {bookings.map((booking) => (
                 <BookingCard 
                   key={booking.id} 
                   booking={booking} 
@@ -136,6 +142,12 @@ export default function MyBookingsPage() {
                   isAdmin={isAdmin}
                 />
               ))}
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+                disabled={isLoading}
+              />
             </div>
           )}
         </div>
@@ -151,6 +163,6 @@ export default function MyBookingsPage() {
         onCancel={() => setModalOpen(false)}
         variant={selectedBooking?.status === BookingStatus.CONFIRMED ? "success" : "danger"}
       />
-    </UserLayout>
+    </>
   );
 }

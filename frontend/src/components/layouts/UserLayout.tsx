@@ -1,12 +1,16 @@
 import Link from "next/link";
 import { ReactNode } from "react";
 import { UserNavbar } from "./UserNavbar";
+import { cookies } from "next/headers";
 
 interface UserLayoutProps {
   children: ReactNode;
 }
 
-export const UserLayout = ({ children }: UserLayoutProps) => {
+export const UserLayout = async ({ children }: UserLayoutProps) => {
+  const cookieStore = await cookies();
+  const isAuth = cookieStore.has("auth_token");
+
   return (
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md">
@@ -27,11 +31,13 @@ export const UserLayout = ({ children }: UserLayoutProps) => {
                     Hotels
                   </Link>
                 </li>
+               {isAuth && (
                 <li>
                   <Link href="/bookings" className="text-sm font-medium text-slate-600 hover:text-brand-primary">
                     My Bookings
                   </Link>
                 </li>
+               )}
               </ul>
             </nav>
           </div>

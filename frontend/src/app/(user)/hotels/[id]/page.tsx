@@ -4,7 +4,6 @@ import { useEffect, useState, use } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { isStaff as checkIsStaff } from "@/lib/auth";
-import { UserLayout } from "@/components/layouts/UserLayout";
 
 interface Room {
   id: string;
@@ -50,29 +49,29 @@ export default function HotelDetailsPage({ params }: { params: Promise<{ id: str
 
   if (isLoading) {
     return (
-      <UserLayout>
+      <>
         <div className="flex justify-center items-center h-[calc(100vh-64px)] bg-slate-50">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"></div>
         </div>
-      </UserLayout>
+      </>
     );
   }
 
   if (!hotel) {
     return (
-      <UserLayout>
+      <>
         <div className="flex flex-col justify-center items-center h-[calc(100vh-64px)] bg-slate-50 space-y-4">
           <h2 className="text-2xl font-bold text-slate-700">Hotel not found</h2>
           <Link href="/hotels" className="text-brand-primary hover:underline">
             ← Back to all hotels
           </Link>
         </div>
-      </UserLayout>
+      </>
     );
   }
 
   return (
-    <UserLayout>
+    <>
       <div className="bg-slate-50 min-h-[calc(100vh-64px)] pb-20">
         {/* Hero Section */}
         <div className="relative h-96 bg-slate-800 text-white overflow-hidden">
@@ -211,6 +210,6 @@ export default function HotelDetailsPage({ params }: { params: Promise<{ id: str
           </div>
         </div>
       </div>
-    </UserLayout>
+    </>
   );
 }

@@ -1,20 +1,22 @@
-"use client";
-
 import { AdminLayout } from "@/components/layouts/AdminLayout";
 import { UserLayout } from "@/components/layouts/UserLayout";
-import { isStaff } from "@/lib/auth";
-import { useEffect, useState } from "react";
+import { cookies } from "next/headers";
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [isStaffMember, setIsStaffMember] = useState(false);
-
-  useEffect(() => {
-    setIsStaffMember(isStaff());
-  }, []);
+  const cookieStore = await cookies();
+  const userCookie = cookieStore.get("auth_user");
+  let isStaffMember = false;
+  
+  if (userCookie) {
+    try {
+      const user = JSON.parse(decodeURIComponent(userCookie.value));
+      isStaffMember = user?.role === "ADMIN" || user?.role === "HOTEL_MANAGER";
+    } catch (e) {}
+  }
 
   if (isStaffMember) {
     return <AdminLayout>{children}</AdminLayout>;

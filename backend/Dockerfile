@@ -1,6 +1,10 @@
 # Use Node.js 22 Alpine as base image
 FROM node:22-alpine AS base
 
+LABEL maintainer="Mohamed Abdellhay"
+LABEL org.opencontainers.image.description="Winsome Hotel Booking Backend"
+LABEL version="1.0.7"
+
 # Install pnpm
 RUN npm install -g pnpm
 

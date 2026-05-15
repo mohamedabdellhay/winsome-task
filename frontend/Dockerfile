@@ -1,6 +1,11 @@
 # Use Node.js 22 Alpine as base image
 FROM node:22-alpine AS base
 
+LABEL maintainer="Mohamed Abd El-Hay"
+LABEL org.opencontainers.image.description="Winsome Hotel Booking Frontend"
+LABEL version="1.0.3"
+
+
 WORKDIR /app
 
 # Copy package file and install dependencies
@@ -28,13 +33,14 @@ FROM node:22-alpine AS production
 WORKDIR /app
 
 ENV NODE_ENV=production
+ENV PORT=8080
 
 # standalone output includes only the files needed to run the server
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 
-EXPOSE 3000
+EXPOSE 8080
 
 # standalone mode uses server.js directly (no npm start needed)
 CMD ["node", "server.js"]

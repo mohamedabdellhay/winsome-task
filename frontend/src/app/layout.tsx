@@ -15,6 +15,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head >
+        <title>Winsome Hotel Booking</title>
+
+        <link rel="icon" href="/icon.jpg" type="image/jpeg" />
+      </head>
       <body>
         <ToastProvider>
           {children}

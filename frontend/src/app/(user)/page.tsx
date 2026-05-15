@@ -1,9 +1,8 @@
 import Link from "next/link";
-import { UserLayout } from "@/components/layouts/UserLayout";
 
 export default function HomePage() {
   return (
-    <UserLayout>
+    <>
       <div className="relative overflow-hidden bg-white py-24 sm:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
@@ -31,6 +30,6 @@ export default function HomePage() {
         {/* Background Decorative Element */}
         <div className="absolute top-0 -z-10 h-full w-full bg-[radial-gradient(circle_at_top_right,_var(--brand-primary)_0%,_transparent_25%)] opacity-5"></div>
       </div>
-    </UserLayout>
+    </>
   );
 }

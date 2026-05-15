@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { isStaff as checkIsStaff } from "@/lib/auth";
-import { UserLayout } from "@/components/layouts/UserLayout";
 
 interface Hotel {
   id: string;
@@ -39,7 +38,7 @@ export default function HotelsListPage() {
   }, []);
 
   return (
-    <UserLayout>
+    <>
       <div className="bg-slate-50 min-h-[calc(100vh-64px)] py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-10 text-center md:text-left">
@@ -117,6 +116,6 @@ export default function HotelsListPage() {
           )}
         </div>
       </div>
-    </UserLayout>
+    </>
   );
 }

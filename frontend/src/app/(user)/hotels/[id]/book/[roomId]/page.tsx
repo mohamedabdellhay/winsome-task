@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { getUser } from "@/lib/auth";
-import { UserLayout } from "@/components/layouts/UserLayout";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
@@ -125,29 +124,29 @@ export default function BookingPage({ params }: { params: Promise<{ id: string; 
 
   if (isLoading) {
     return (
-      <UserLayout>
+      <>
         <div className="flex justify-center items-center h-[calc(100vh-64px)] bg-slate-50">
           <LoadingSpinner />
         </div>
-      </UserLayout>
+      </>
     );
   }
 
   if (!hotel || !room) {
     return (
-      <UserLayout>
+      <>
         <div className="flex flex-col justify-center items-center h-[calc(100vh-64px)] bg-slate-50 space-y-4">
           <h2 className="text-2xl font-bold text-slate-700">Error loading booking details</h2>
           <Link href={`/hotels/${id}`} className="text-brand-primary hover:underline">
             ← Back to hotel
           </Link>
         </div>
-      </UserLayout>
+      </>
     );
   }
 
   return (
-    <UserLayout>
+    <>
       <div className="bg-slate-50 min-h-[calc(100vh-64px)] py-12">
         <div className="w-full mx-auto px-4">
           <Link href={`/hotels/${id}`} className="inline-flex items-center text-slate-500 hover:text-brand-primary mb-8 transition-colors">
@@ -280,6 +279,6 @@ export default function BookingPage({ params }: { params: Promise<{ id: string; 
           </div>
         </div>
       </div>
-    </UserLayout>
+    </>
   );
 }

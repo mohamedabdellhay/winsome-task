@@ -13,6 +13,7 @@ interface DashboardStats {
 }
 
 import { isAdmin as checkIsAdmin, isStaff as checkIsStaff, getUser } from "@/lib/auth";
+import Link from "next/link";
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -67,12 +68,12 @@ export default function DashboardPage() {
             <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">Welcome back!</h1>
             <p className="text-slate-500 mt-2 text-lg font-medium">Ready for your next adventure?</p>
           </div>
-          <a 
+          <Link 
             href="/hotels" 
             className="bg-brand-primary text-white px-8 py-3.5 rounded-2xl font-bold hover:bg-brand-primary/90 transition-all shadow-xl shadow-brand-primary/20 flex items-center justify-center gap-2 text-center"
           >
             Explore Hotels
-          </a>
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -84,9 +85,9 @@ export default function DashboardPage() {
             </div>
             <h3 className="text-xl font-bold text-slate-900 mb-2">My Bookings</h3>
             <p className="text-slate-500 font-medium mb-6">Manage your upcoming stays and view your travel history.</p>
-            <a href="/bookings" className="text-brand-primary font-bold inline-flex items-center gap-1 hover:gap-2 transition-all">
+            <Link href="/bookings" className="text-brand-primary font-bold inline-flex items-center gap-1 hover:gap-2 transition-all">
               View all bookings <span>→</span>
-            </a>
+            </Link>
           </div>
 
           <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-xl shadow-slate-200/40 group hover:border-brand-primary/20 transition-all">
@@ -97,9 +98,9 @@ export default function DashboardPage() {
             </div>
             <h3 className="text-xl font-bold text-slate-900 mb-2">Explore Deals</h3>
             <p className="text-slate-500 font-medium mb-6">Discover exclusive offers on luxury hotels around the world.</p>
-            <a href="/hotels" className="text-brand-primary font-bold inline-flex items-center gap-1 hover:gap-2 transition-all">
+            <Link href="/hotels" className="text-brand-primary font-bold inline-flex items-center gap-1 hover:gap-2 transition-all">
               Find hotels <span>→</span>
-            </a>
+            </Link>
           </div>
         </div>
       </div>
@@ -192,7 +193,7 @@ export default function DashboardPage() {
             {isAdmin ? "Real-time performance metrics" : `Analytics for ${user?.managedHotel?.name || "your assigned hotel"}`}
           </p>
         </div>
-        <a 
+        <Link 
           href="/dashboard/bookings" 
           className="bg-brand-primary text-white px-6 py-2.5 rounded-xl font-bold hover:bg-brand-primary/90 transition-all shadow-lg shadow-brand-primary/20 flex items-center gap-2"
         >
@@ -200,7 +201,7 @@ export default function DashboardPage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
           Manage Bookings
-        </a>
+        </Link>
       </div>
 
       <div className={`grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 ${isAdmin ? 'xl:grid-cols-5' : 'xl:grid-cols-4'}`}>

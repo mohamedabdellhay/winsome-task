@@ -8,11 +8,14 @@ import { isAdmin as checkIsAdmin } from "@/lib/auth";
 import { useToast } from "@/components/ui/Toast";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { BookingStatus } from "@/types/booking";
+import { Pagination } from "@/components/ui/Pagination";
 
 export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [isAdmin, setIsAdmin] = useState(false);
   const { showToast } = useToast();
 
@@ -20,10 +23,14 @@ export default function AdminBookingsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<{ id: string, status: BookingStatus } | null>(null);
 
-  const fetchBookings = async () => {
+  const fetchBookings = async (currentPage: number) => {
+    setIsLoading(true);
     try {
-      const response = await api.get("/bookings");
+      const response = await api.get("/bookings", { params: { page: currentPage, limit: 10 } });
       setBookings(response.data.data ?? response.data);
+      if (response.data.meta) {
+        setTotalPages(response.data.meta.totalPages);
+      }
     } catch (err) {
       console.error("Failed to fetch bookings:", err);
       setError("Failed to load bookings. Please try again later.");
@@ -34,8 +41,8 @@ export default function AdminBookingsPage() {
 
   useEffect(() => {
     setIsAdmin(checkIsAdmin());
-    fetchBookings();
-  }, []);
+    fetchBookings(page);
+  }, [page]);
 
   const handleStatusUpdate = (id: string, status: BookingStatus) => {
     setSelectedBooking({ id, status });
@@ -110,7 +117,7 @@ export default function AdminBookingsPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6">
-          {bookings.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((booking) => (
+          {bookings.map((booking) => (
             <BookingCard 
               key={booking.id} 
               booking={booking} 
@@ -118,6 +125,12 @@ export default function AdminBookingsPage() {
               isAdmin={isAdmin}
             />
           ))}
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            disabled={isLoading}
+          />
         </div>
       )}
 

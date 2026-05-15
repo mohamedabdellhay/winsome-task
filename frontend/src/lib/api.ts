@@ -2,11 +2,22 @@ import axios, { AxiosError } from "axios";
 import { getToken, clearToken } from "./auth";
 
 const getBaseURL = () => {
-  let url = process.env.NEXT_PUBLIC_API_URL;
-  if (!url || url === "undefined") {
-    url = "http://localhost:3001";
+  const envUrl = process.env.NEXT_PUBLIC_API_URL;
+
+  let baseUrl = envUrl && envUrl !== "undefined" ? envUrl : "http://localhost:3001";
+
+  if (envUrl && envUrl !== "undefined" && !envUrl.includes("localhost")) {
+    baseUrl = envUrl;
+  } else if (typeof window !== "undefined") {
+    const { protocol, hostname } = window.location;
+    if (hostname !== "localhost" && hostname !== "127.0.0.1") {
+      baseUrl = `${protocol}//${hostname}:3001`;
+    }
   }
-  return url;
+
+  // Ensure trailing slash is removed before appending version
+  baseUrl = baseUrl.replace(/\/$/, "");
+  return `${baseUrl}/api/v1`;
 };
 
 const instance = axios.create({

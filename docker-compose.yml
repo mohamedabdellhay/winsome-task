@@ -9,6 +9,7 @@ services:
       DATABASE_URL: postgresql://postgres:password@postgres:5432/hotel_booking
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
       PORT: 3001
     ports:
       - "3001:3001"
@@ -24,7 +25,7 @@ services:
         - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
     container_name: winsome_frontend
     ports:
-      - "3000:3000"
+      - "8080:8080"
     depends_on:
       - backend
 
