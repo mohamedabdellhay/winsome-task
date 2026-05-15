@@ -52,6 +52,10 @@ export class BookingsService {
         );
       }
 
+      if (room.availableCount <= 0) {
+        throw new BadRequestException('Room is not available for the selected dates.');
+      }
+
       const overlappingBookings = await tx.booking.count({
         where: {
           roomId,
@@ -68,6 +72,11 @@ export class BookingsService {
       }
 
       const totalPrice = Number(room.pricePerNight) * diffDays;
+
+      await tx.room.update({
+        where: { id: roomId },
+        data: { availableCount: { decrement: 1 } },
+      });
 
       return tx.booking.create({
         data: {
@@ -161,10 +170,22 @@ export class BookingsService {
       throw new BadRequestException('Users can only cancel their bookings.');
     }
 
-    return this.prisma.booking.update({
-      where: { id },
-      data: { status },
-      include: { hotel: true, room: true },
+    return this.prisma.$transaction(async (tx) => {
+      if (
+        status === BookingStatus.CANCELLED &&
+        booking.status !== BookingStatus.CANCELLED
+      ) {
+        await tx.room.update({
+          where: { id: booking.roomId },
+          data: { availableCount: { increment: 1 } },
+        });
+      }
+
+      return tx.booking.update({
+        where: { id },
+        data: { status },
+        include: { hotel: true, room: true },
+      });
     });
   }
 }
