@@ -94,7 +94,7 @@ export default function HotelDetailsPage({ params }: { params: Promise<{ id: str
         </div>
 
         {/* Content Section */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+        <div className="w-full mx-auto px-1 sm:px-6 lg:px-8 mt-12">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             
             {/* Left Column - Details */}
@@ -135,9 +135,12 @@ export default function HotelDetailsPage({ params }: { params: Promise<{ id: str
                             <span className="text-slate-500 text-sm"> / night</span>
                           </div>
                           {room.availableCount > 0 ? (
-                            <button className="w-full md:w-auto bg-brand-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-brand-primary/90 transition-all shadow-lg shadow-brand-primary/20">
-                              Select Room
-                            </button>
+                            <Link 
+                              href={`/hotels/${hotel.id}/book/${room.id}`}
+                              className="w-full md:w-auto bg-brand-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-brand-primary/90 transition-all shadow-lg shadow-brand-primary/20 text-center"
+                            >
+                              Book Now
+                            </Link>
                           ) : (
                             <button disabled className="w-full md:w-auto bg-slate-200 text-slate-500 px-8 py-3 rounded-xl font-bold cursor-not-allowed">
                               Sold Out

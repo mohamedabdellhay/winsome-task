@@ -24,6 +24,12 @@ export const UserNavbar = () => {
       {isAuth ? (
         <>
           <Link 
+            href="/bookings" 
+            className="text-sm font-medium text-slate-600 hover:text-brand-primary"
+          >
+            My Bookings
+          </Link>
+          <Link 
             href="/dashboard" 
             className="text-sm font-medium text-slate-600 hover:text-brand-primary"
           >

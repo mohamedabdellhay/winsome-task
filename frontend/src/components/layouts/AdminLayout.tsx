@@ -56,6 +56,12 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
           >
             Bookings
           </Link>
+          <Link 
+            href="/dashboard/rooms" 
+            className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
+          >
+            Rooms
+          </Link>
           {admin && (
             <>
               <Link 

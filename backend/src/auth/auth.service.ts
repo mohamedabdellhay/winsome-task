@@ -55,6 +55,11 @@ export class AuthService {
   async login(dto: LoginDto) {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
+      include: {
+        managedHotel: {
+          select: { id: true },
+        },
+      },
     });
     if (!user) {
       throw new UnauthorizedException("Invalid credentials");
@@ -82,6 +87,9 @@ export class AuthService {
         role: true,
         createdAt: true,
         updatedAt: true,
+        managedHotel: {
+          select: { id: true },
+        },
       },
     });
     return user || null;

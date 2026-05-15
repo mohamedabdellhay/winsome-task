@@ -19,13 +19,31 @@ export class RoomsService {
     });
   }
 
-  async findAll(hotelId?: string) {
-    return this.prisma.room.findMany({
-      where: hotelId ? { hotelId } : {},
-      include: {
-        hotel: true,
+  async findAll(hotelId?: string, page: number = 1, limit: number = 10) {
+    const whereClause = hotelId ? { hotelId } : {};
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await Promise.all([
+      this.prisma.room.findMany({
+        where: whereClause,
+        skip,
+        take: limit,
+        include: {
+          hotel: true,
+        },
+      }),
+      this.prisma.room.count({ where: whereClause })
+    ]);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit) || 1,
       },
-    });
+    };
   }
 
   async findOne(id: string) {
