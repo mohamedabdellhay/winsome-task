@@ -7,8 +7,10 @@ export function middleware(request: NextRequest) {
 
   const isAuthRoute = pathname === "/login" || pathname === "/register";
   const isDashboard = pathname.startsWith("/dashboard");
+  const isBookings = pathname === "/bookings";
+  const isBookingFlow = /^\/hotels\/[^/]+\/book\/[^/]+$/.test(pathname);
 
-  if (!token && isDashboard) {
+  if (!token && (isDashboard || isBookings || isBookingFlow)) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
@@ -20,5 +22,11 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login", "/register"],
+  matcher: [
+    "/dashboard/:path*",
+    "/login",
+    "/register",
+    "/bookings",
+    "/hotels/:id/book/:roomId",
+  ],
 };

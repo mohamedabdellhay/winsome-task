@@ -1,5 +1,6 @@
-import { IsString, IsInt, IsOptional, Min, Max } from 'class-validator';
+import { IsString, IsInt, IsOptional, IsEnum, IsUUID, IsNotEmpty, Min, Max } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { HotelStatus } from '@prisma/client';
 
 export class CreateHotelDto {
   @ApiProperty({
@@ -35,12 +36,21 @@ export class CreateHotelDto {
   stars: number;
 
   @ApiProperty({
-    required: false,
     example: '44176aae-3143-426c-b0a2-34e9fca2e681',
-    description: 'The ID of the manager assigned to this hotel. If not provided, it may be auto-assigned or remain null.',
+    description: 'The ID of the hotel manager assigned to this hotel.',
   })
-  @IsString()
-  @IsOptional()
+  @IsUUID('4', { message: 'Manager ID must be a valid UUID' })
+  @IsNotEmpty({ message: 'Manager ID is required' })
   managerId: string;
+
+  @ApiProperty({
+    required: false,
+    enum: HotelStatus,
+    example: HotelStatus.ACTIVE,
+    description: 'Hotel status (Active or Inactive)',
+  })
+  @IsOptional()
+  @IsEnum(HotelStatus, { message: 'Status must be ACTIVE or INACTIVE' })
+  status?: HotelStatus;
 }
 

@@ -47,8 +47,9 @@ export class AuthService {
 
     const payload = { sub: user.id, email: user.email, role: user.role };
     return {
-    user: this.sanitizeUser(user),
-    message: "User created successfully"
+      accessToken: this.jwtService.sign(payload),
+      user: this.sanitizeUser(user),
+      message: 'User created successfully',
     };
   }
 

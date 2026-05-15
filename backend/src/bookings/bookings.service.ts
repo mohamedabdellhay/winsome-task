@@ -12,7 +12,12 @@ import { BookingStatus, Role } from '@prisma/client';
 export class BookingsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createBookingDto: CreateBookingDto, userId: string) {
+  async create(createBookingDto: CreateBookingDto, user: any) {
+    if (user.role === Role.HOTEL_MANAGER) {
+      throw new ForbiddenException('Hotel managers are not allowed to make bookings.');
+    }
+
+    const userId = user.id;
     const { hotelId, roomId, checkIn, checkOut, guestCount } = createBookingDto;
 
     const checkInDate = new Date(checkIn);
@@ -20,7 +25,6 @@ export class BookingsService {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // 1. Validate dates
     if (checkInDate >= checkOutDate) {
       throw new BadRequestException('Check-in date must be before check-out date.');
     }
@@ -29,79 +33,93 @@ export class BookingsService {
       throw new BadRequestException('Check-in date cannot be in the past.');
     }
 
-    // 2. Get room details
-    const room = await this.prisma.room.findUnique({
-      where: { id: roomId },
-      include: { hotel: true },
-    });
-
-    if (!room || room.hotelId !== hotelId) {
-      throw new NotFoundException('Room not found in the specified hotel.');
-    }
-
-    if (guestCount > room.capacity) {
-      throw new BadRequestException(`Room capacity exceeded. Maximum ${room.capacity} guests allowed.`);
-    }
-
-    // 3. Check availability
-    // Overlap condition: (existing.checkIn < new.checkOut) AND (existing.checkOut > new.checkIn)
-    const overlappingBookings = await this.prisma.booking.count({
-      where: {
-        roomId,
-        status: { in: [BookingStatus.PENDING, BookingStatus.CONFIRMED] },
-        AND: [
-          { checkIn: { lt: checkOutDate } },
-          { checkOut: { gt: checkInDate } },
-        ],
-      },
-    });
-
-    if (overlappingBookings >= room.availableCount) {
-      throw new BadRequestException('Room is not available for the selected dates.');
-    }
-
-    // 4. Calculate price
     const diffTime = Math.abs(checkOutDate.getTime() - checkInDate.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    const totalPrice = Number(room.pricePerNight) * diffDays;
 
-    // 5. Create booking
-    return this.prisma.booking.create({
-      data: {
-        checkIn: checkInDate,
-        checkOut: checkOutDate,
-        guestCount,
-        totalPrice,
-        status: BookingStatus.PENDING,
-        userId,
-        hotelId,
-        roomId,
-      },
-      include: {
-        hotel: true,
-        room: true,
-      },
+    return this.prisma.$transaction(async (tx) => {
+      const room = await tx.room.findUnique({
+        where: { id: roomId },
+        include: { hotel: true },
+      });
+
+      if (!room || room.hotelId !== hotelId) {
+        throw new NotFoundException('Room not found in the specified hotel.');
+      }
+
+      if (guestCount > room.capacity) {
+        throw new BadRequestException(
+          `Room capacity exceeded. Maximum ${room.capacity} guests allowed.`,
+        );
+      }
+
+      const overlappingBookings = await tx.booking.count({
+        where: {
+          roomId,
+          status: { in: [BookingStatus.PENDING, BookingStatus.CONFIRMED] },
+          AND: [
+            { checkIn: { lt: checkOutDate } },
+            { checkOut: { gt: checkInDate } },
+          ],
+        },
+      });
+
+      if (overlappingBookings >= room.availableCount) {
+        throw new BadRequestException('Room is not available for the selected dates.');
+      }
+
+      const totalPrice = Number(room.pricePerNight) * diffDays;
+
+      return tx.booking.create({
+        data: {
+          checkIn: checkInDate,
+          checkOut: checkOutDate,
+          guestCount,
+          totalPrice,
+          status: BookingStatus.PENDING,
+          userId,
+          hotelId,
+          roomId,
+        },
+        include: {
+          hotel: true,
+          room: true,
+        },
+      });
     });
   }
 
-  async findAll(user: any) {
+  async findAll(user: any, page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
+    let where = {};
+
     if (user.role === Role.ADMIN) {
-      return this.prisma.booking.findMany({
-        include: { hotel: true, room: true, user: true },
-      });
+      where = {};
+    } else if (user.role === Role.HOTEL_MANAGER) {
+      where = { hotel: { managerId: user.id } };
+    } else {
+      where = { userId: user.id };
     }
 
-    if (user.role === Role.HOTEL_MANAGER) {
-      return this.prisma.booking.findMany({
-        where: { hotel: { managerId: user.id } },
+    const [data, total] = await Promise.all([
+      this.prisma.booking.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
         include: { hotel: true, room: true, user: true },
-      });
-    }
+      }),
+      this.prisma.booking.count({ where }),
+    ]);
 
-    return this.prisma.booking.findMany({
-      where: { userId: user.id },
-      include: { hotel: true, room: true },
-    });
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit) || 1,
+      },
+    };
   }
 
   async findOne(id: string, user: any) {
@@ -115,7 +133,7 @@ export class BookingsService {
     }
 
     if (user.role === Role.ADMIN) return booking;
-    
+
     if (user.role === Role.HOTEL_MANAGER && booking.hotel.managerId === user.id) {
       return booking;
     }
@@ -130,16 +148,15 @@ export class BookingsService {
   async updateStatus(id: string, status: BookingStatus, user: any) {
     const booking = await this.findOne(id, user);
 
-    // Permission check
     const isOwner = booking.userId === user.id;
-    const isHotelManager = user.role === Role.HOTEL_MANAGER && booking.hotel.managerId === user.id;
+    const isHotelManager =
+      user.role === Role.HOTEL_MANAGER && booking.hotel.managerId === user.id;
     const isAdmin = user.role === Role.ADMIN;
 
     if (!isAdmin && !isHotelManager && !isOwner) {
       throw new ForbiddenException('Permission denied.');
     }
 
-    // Business logic: Users can only cancel
     if (user.role === Role.USER && status !== BookingStatus.CANCELLED) {
       throw new BadRequestException('Users can only cancel their bookings.');
     }

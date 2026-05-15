@@ -20,6 +20,8 @@ import { UpdateHotelDto } from './dto/update-hotel.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
+import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
+import { GetUser } from '../auth/decorators/get-user.decorator';
 import { Role } from '@prisma/client';
 import {
   ApiTags,
@@ -37,13 +39,13 @@ import {
 } from '@nestjs/swagger';
 
 @ApiTags('hotels')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('hotels')
 export class HotelsController {
   constructor(private readonly hotelsService: HotelsService) {}
 
   @Post()
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @ApiOperation({
     summary: 'Create a new hotel',
@@ -73,6 +75,7 @@ export class HotelsController {
   }
 
   @Get()
+  @UseGuards(OptionalJwtAuthGuard)
   @ApiOperation({
     summary: 'Get all hotels',
     description:
@@ -129,17 +132,20 @@ export class HotelsController {
     @Query('search') search?: string,
     @Query('page') page?: string,
     @Query('limit') limit?: string,
+    @GetUser() user?: { role: Role },
   ) {
     try {
       const pageNumber = page ? parseInt(page, 10) : 1;
       const limitNumber = limit ? parseInt(limit, 10) : 10;
-      return await this.hotelsService.findAll(search, pageNumber, limitNumber);
+      const activeOnly = !user || user.role !== Role.ADMIN;
+      return await this.hotelsService.findAll(search, pageNumber, limitNumber, activeOnly);
     } catch (error) {
       throw new InternalServerErrorException('Failed to fetch hotels.');
     }
   }
 
   @Get(':id')
+  @UseGuards(OptionalJwtAuthGuard)
   @ApiOperation({
     summary:
       'Get a hotel by ID /\/\/\/\/\/\ this is not required by the task I just added it as bonus :)',
@@ -183,9 +189,10 @@ export class HotelsController {
   @ApiInternalServerErrorResponse({
     description: 'Failed to fetch hotel details.',
   })
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string, @GetUser() user?: { role: Role }) {
     try {
-      return await this.hotelsService.findOne(id);
+      const activeOnly = !user || user.role !== Role.ADMIN;
+      return await this.hotelsService.findOne(id, activeOnly);
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
@@ -195,6 +202,8 @@ export class HotelsController {
   }
 
   @Patch(':id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @ApiOperation({
     summary: 'Update a hotel',
@@ -228,6 +237,8 @@ export class HotelsController {
   }
 
   @Delete(':id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({

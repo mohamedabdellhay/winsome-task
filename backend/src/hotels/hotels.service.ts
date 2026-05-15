@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { HotelStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateHotelDto } from './dto/create-hotel.dto';
 import { UpdateHotelDto } from './dto/update-hotel.dto';
@@ -14,15 +15,24 @@ export class HotelsService {
     });
   }
 
-  async findAll(search?: string, page: number = 1, limit: number = 10) {
-    const whereClause = search
-      ? {
-          OR: [
-            { name: { contains: search, mode: 'insensitive' as const } },
-            { city: { contains: search, mode: 'insensitive' as const } },
-          ],
-        }
-      : {};
+  async findAll(
+    search?: string,
+    page: number = 1,
+    limit: number = 10,
+    activeOnly = false,
+  ) {
+    const whereClause: Prisma.HotelWhereInput = {};
+
+    if (activeOnly) {
+      whereClause.status = HotelStatus.ACTIVE;
+    }
+
+    if (search) {
+      whereClause.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { city: { contains: search, mode: 'insensitive' } },
+      ];
+    }
 
     const skip = (page - 1) * limit;
 
@@ -55,7 +65,7 @@ export class HotelsService {
     };
   }
 
-  async findOne(id: string) {
+  async findOne(id: string, activeOnly = false) {
     const hotel = await this.prisma.hotel.findUnique({
       where: { id },
       include: {
@@ -70,6 +80,9 @@ export class HotelsService {
       },
     });
     if (!hotel) {
+      throw new NotFoundException(`Hotel with ID ${id} not found`);
+    }
+    if (activeOnly && hotel.status !== HotelStatus.ACTIVE) {
       throw new NotFoundException(`Hotel with ID ${id} not found`);
     }
     return hotel;

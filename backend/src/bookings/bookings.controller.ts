@@ -5,6 +5,7 @@ import {
   Body,
   Patch,
   Param,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { BookingsService } from './bookings.service';
@@ -24,6 +25,7 @@ import {
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiBody,
+  ApiQuery,
 } from '@nestjs/swagger';
 
 @ApiTags('bookings')
@@ -43,7 +45,7 @@ export class BookingsController {
   @ApiBadRequestResponse({ description: 'Invalid input or room not available.' })
   @ApiInternalServerErrorResponse({ description: 'Server error.' })
   create(@Body() createBookingDto: CreateBookingDto, @GetUser() user: any) {
-    return this.bookingsService.create(createBookingDto, user.id);
+    return this.bookingsService.create(createBookingDto, user);
   }
 
   @Get()
@@ -51,9 +53,17 @@ export class BookingsController {
     summary: 'Get all bookings',
     description: 'Retrieves all bookings for the authenticated user. Admins can see all bookings.',
   })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
   @ApiOkResponse({ description: 'List of bookings retrieved successfully.' })
-  findAll(@GetUser() user: any) {
-    return this.bookingsService.findAll(user);
+  findAll(
+    @GetUser() user: any,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const pageNumber = page ? parseInt(page, 10) : 1;
+    const limitNumber = limit ? parseInt(limit, 10) : 10;
+    return this.bookingsService.findAll(user, pageNumber, limitNumber);
   }
 
   @Get(':id')

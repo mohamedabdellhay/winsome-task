@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api";
+import { isStaff as checkIsStaff } from "@/lib/auth";
 import { UserLayout } from "@/components/layouts/UserLayout";
 
 interface Hotel {
@@ -16,15 +17,19 @@ interface Hotel {
 export default function HotelsListPage() {
   const [hotels, setHotels] = useState<Hotel[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isStaff, setIsStaff] = useState(false);
 
+  useEffect(() => {
+    setIsStaff(checkIsStaff());
+  }, []);
   useEffect(() => {
     const fetchHotels = async () => {
       try {
         const response = await api.get("/hotels");
-        // API now returns { data, meta } for pagination
         setHotels(response.data.data || []);
-      } catch (error) {
-        console.error("Failed to fetch hotels:", error);
+      } catch {
+        setError("Failed to load hotels. Please try again later.");
       } finally {
         setIsLoading(false);
       }
@@ -42,7 +47,11 @@ export default function HotelsListPage() {
             <p className="mt-2 text-lg text-slate-600">Choose from our curated selection of top-rated destinations.</p>
           </div>
 
-          {isLoading ? (
+          {error ? (
+            <div className="text-center py-20 bg-white rounded-3xl border border-rose-100">
+              <p className="text-rose-600">{error}</p>
+            </div>
+          ) : isLoading ? (
             <div className="flex justify-center items-center h-64">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"></div>
             </div>
@@ -92,12 +101,14 @@ export default function HotelsListPage() {
                         <span className="text-xs text-slate-400 uppercase font-bold tracking-wider">Starts from</span>
                         <p className="text-lg font-bold text-brand-dark">$199<span className="text-sm font-normal text-slate-500">/night</span></p>
                       </div>
-                      <Link 
-                        href={`/hotels/${hotel.id}`} 
-                        className="bg-brand-primary text-white px-5 py-2.5 rounded-full text-sm font-bold hover:bg-brand-primary/90 transition-colors shadow-lg shadow-brand-primary/20"
-                      >
-                        Book Now
-                      </Link>
+                      {!isStaff && (
+                        <Link 
+                          href={`/hotels/${hotel.id}`} 
+                          className="bg-brand-primary text-white px-5 py-2.5 rounded-full text-sm font-bold hover:bg-brand-primary/90 transition-colors shadow-lg shadow-brand-primary/20"
+                        >
+                          Book Now
+                        </Link>
+                      )}
                     </div>
                   </div>
                 </div>

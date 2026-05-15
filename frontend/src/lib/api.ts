@@ -3,11 +3,9 @@ import { getToken, clearToken } from "./auth";
 
 const getBaseURL = () => {
   let url = process.env.NEXT_PUBLIC_API_URL;
-  console.log("Environment NEXT_PUBLIC_API_URL:", url);
   if (!url || url === "undefined") {
     url = "http://localhost:3001";
   }
-  console.log("Final API Base URL:", url);
   return url;
 };
 
@@ -30,9 +28,15 @@ instance.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     if (error.response?.status === 401) {
-      clearToken();
-      if (typeof window !== "undefined") {
-        window.location.href = "/login";
+      const isAuthPage =
+        typeof window !== "undefined" &&
+        (window.location.pathname === "/login" ||
+          window.location.pathname === "/register");
+      if (!isAuthPage) {
+        clearToken();
+        if (typeof window !== "undefined") {
+          window.location.href = "/login";
+        }
       }
     }
     return Promise.reject(error);
@@ -46,8 +50,6 @@ export async function get<T>(url: string, params?: any) {
 }
 
 export async function post<T>(url: string, data?: any) {
-  console.log("url", url);
-
   return instance.post<T>(url, data);
 }
 

@@ -7,12 +7,7 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { isAdmin as checkIsAdmin } from "@/lib/auth";
 import { useToast } from "@/components/ui/Toast";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
-
-enum BookingStatus {
-  PENDING = "PENDING",
-  CONFIRMED = "CONFIRMED",
-  CANCELLED = "CANCELLED",
-}
+import { BookingStatus } from "@/types/booking";
 
 export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -28,7 +23,7 @@ export default function AdminBookingsPage() {
   const fetchBookings = async () => {
     try {
       const response = await api.get("/bookings");
-      setBookings(response.data);
+      setBookings(response.data.data ?? response.data);
     } catch (err) {
       console.error("Failed to fetch bookings:", err);
       setError("Failed to load bookings. Please try again later.");

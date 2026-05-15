@@ -3,6 +3,8 @@ import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
+import { Public } from '../auth/decorators/public.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
@@ -103,6 +105,7 @@ export class RoomsController {
   }
 
   @Get(':id')
+  @Public()
   @ApiOperation({ summary: 'Get a room by ID', description: 'Retrieves detailed information about a specific room.' })
   @ApiOkResponse({
     description: 'The room details have been successfully retrieved.',
