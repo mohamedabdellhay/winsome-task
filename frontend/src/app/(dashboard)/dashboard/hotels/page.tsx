@@ -228,7 +228,7 @@ export default function AdminHotelsPage() {
               <Button 
                 className="bg-red-600 hover:bg-red-700 focus:ring-red-600/20 shadow-red-600/20" 
                 onClick={confirmDelete}
-                isLoading={isDeleting}
+                loading={isDeleting}
               >
                 Delete Hotel
               </Button>

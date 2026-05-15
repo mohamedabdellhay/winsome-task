@@ -11,9 +11,9 @@ import { Input } from "@/components/ui/Input";
 
 const roomSchema = z.object({
   type: z.string().min(2, "Room type is required"),
-  capacity: z.preprocess((val) => Number(val), z.number().min(1, "Capacity must be at least 1")),
-  pricePerNight: z.preprocess((val) => Number(val), z.number().min(1, "Price must be greater than 0")),
-  availableCount: z.preprocess((val) => Number(val), z.number().min(0, "Availability cannot be negative")),
+  capacity: z.coerce.number().min(1, "Capacity must be at least 1"),
+  pricePerNight: z.coerce.number().min(1, "Price must be greater than 0"),
+  availableCount: z.coerce.number().min(0, "Availability cannot be negative"),
 });
 
 type RoomFormValues = z.infer<typeof roomSchema>;
@@ -33,7 +33,7 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
     reset,
     formState: { errors },
   } = useForm<RoomFormValues>({
-    resolver: zodResolver(roomSchema),
+    resolver: zodResolver(roomSchema) as any,
   });
 
   useEffect(() => {
@@ -144,7 +144,7 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
           <Button 
             type="submit" 
             className="flex-1" 
-            isLoading={isSubmitting}
+            loading={isSubmitting}
           >
             Save Changes
           </Button>

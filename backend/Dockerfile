@@ -7,27 +7,26 @@ RUN npm install -g pnpm
 # Set working directory
 WORKDIR /app
 
-# Set CI to true and configure pnpm to ignore scripts to avoid TTY and approval errors
+# Set CI to true
 ENV CI=true
-RUN pnpm config set ignore-scripts true
 
 # Copy package files
 COPY package.json pnpm-lock.yaml ./
 
-# Copy Prisma schema so postinstall can generate the client
+# Copy Prisma schema so generate can run after install
 COPY prisma ./prisma
 
-# Install dependencies
+# Install dependencies (skipping scripts to avoid TTY issues)
 RUN pnpm install --ignore-scripts
 
 # Copy source code
 COPY . .
 
-# Generate Prisma client
+# Generate Prisma client explicitly
 RUN npx prisma generate
 
-# Build the application
-RUN npx nest build
+# Build the NestJS application (run tsc directly to avoid any nest-cli issues)
+RUN npx nest build && ls -la dist/
 
 # Production stage
 FROM node:22-alpine AS production

@@ -1,33 +1,40 @@
 # Use Node.js 22 Alpine as base image
 FROM node:22-alpine AS base
 
-# Set working directory
 WORKDIR /app
 
-# Copy package file only and install dependencies
+# Copy package file and install dependencies
 COPY package.json ./
 RUN npm install
 
-# Copy source code
-COPY . .
+# ── Build stage ──────────────────────────────────────────────────────────────
+FROM base AS builder
 
-# Build the application
-RUN npm run build
-
-# Production stage
-FROM node:22-alpine AS production
-
-# Set working directory
 WORKDIR /app
 
-# Copy built application and dependencies from base stage
-COPY --from=base /app/.next ./.next
-COPY --from=base /app/public ./public
 COPY --from=base /app/node_modules ./node_modules
-COPY --from=base /app/package.json ./package.json
 
-# Expose port
+# Accept the public API URL at build time so Next.js can bake it in
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+
+# Copy source and build
+COPY . .
+RUN npm run build
+
+# ── Production stage ─────────────────────────────────────────────────────────
+FROM node:22-alpine AS production
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+# standalone output includes only the files needed to run the server
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
+
 EXPOSE 3000
 
-# Start the application
-CMD ["npm", "start"]
+# standalone mode uses server.js directly (no npm start needed)
+CMD ["node", "server.js"]

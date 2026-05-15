@@ -106,7 +106,7 @@ export default function CreateManagerPage() {
           <Button 
             type="submit" 
             className="flex-1" 
-            isLoading={isLoading}
+            loading={isLoading}
           >
             Create Account
           </Button>

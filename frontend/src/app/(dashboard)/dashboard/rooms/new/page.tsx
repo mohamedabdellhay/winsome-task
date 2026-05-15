@@ -12,9 +12,9 @@ import { getUser } from "@/lib/auth";
 
 const roomSchema = z.object({
   type: z.string().min(2, "Room type is required (e.g., Deluxe, Suite)"),
-  capacity: z.preprocess((val) => Number(val), z.number().min(1, "Capacity must be at least 1")),
-  pricePerNight: z.preprocess((val) => Number(val), z.number().min(1, "Price must be greater than 0")),
-  availableCount: z.preprocess((val) => Number(val), z.number().min(0, "Availability cannot be negative")),
+  capacity: z.coerce.number().min(1, "Capacity must be at least 1"),
+  pricePerNight: z.coerce.number().min(1, "Price must be greater than 0"),
+  availableCount: z.coerce.number().min(0, "Availability cannot be negative"),
   hotelId: z.string().min(1, "You must select a hotel for this room"),
 });
 
@@ -38,7 +38,7 @@ export default function AddRoomPage() {
     setValue,
     formState: { errors },
   } = useForm<RoomFormValues>({
-    resolver: zodResolver(roomSchema),
+    resolver: zodResolver(roomSchema) as any,
     defaultValues: {
       capacity: 2,
       availableCount: 1,
@@ -157,7 +157,7 @@ export default function AddRoomPage() {
           <Button 
             type="submit" 
             className="flex-1" 
-            isLoading={isLoading}
+            loading={isLoading}
           >
             Create Room
           </Button>

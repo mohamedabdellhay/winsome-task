@@ -4,6 +4,7 @@ import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { api } from "@/lib/api";
+import { getUser } from "@/lib/auth";
 import { UserLayout } from "@/components/layouts/UserLayout";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -34,6 +35,14 @@ export default function BookingPage({ params }: { params: Promise<{ id: string; 
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Redirect hotel managers away from the booking page
+  useEffect(() => {
+    const user = getUser();
+    if (user?.role === "HOTEL_MANAGER") {
+      router.replace(`/hotels/${id}`);
+    }
+  }, [id, router]);
 
   // Form states
   const [checkIn, setCheckIn] = useState("");
@@ -207,10 +216,11 @@ export default function BookingPage({ params }: { params: Promise<{ id: string; 
 
                     <Button
                       type="submit"
-                      disabled={isSubmitting || !checkIn || !checkOut || totalPrice === 0}
+                      loading={isSubmitting}
+                      disabled={!checkIn || !checkOut || totalPrice === 0}
                       className="w-full py-4 rounded-xl text-lg font-bold bg-brand-primary hover:bg-brand-primary/90 text-white transition-all shadow-lg shadow-brand-primary/20"
                     >
-                      {isSubmitting ? <LoadingSpinner size="sm" color="white" /> : "Complete Booking"}
+                      Complete Booking
                     </Button>
                   </form>
                 </div>

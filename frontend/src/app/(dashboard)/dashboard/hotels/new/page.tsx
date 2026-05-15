@@ -13,7 +13,7 @@ const hotelSchema = z.object({
   name: z.string().min(3, "Hotel name must be at least 3 characters"),
   city: z.string().min(2, "City name is required"),
   address: z.string().min(5, "Address is required"),
-  stars: z.preprocess((val) => Number(val), z.number().min(1).max(5)),
+  stars: z.string().transform((val) => Number(val)).pipe(z.number().min(1).max(5)),
   managerId: z.string().min(1, "You must assign a hotel manager"),
 });
 
@@ -36,7 +36,7 @@ export default function NewHotelPage() {
     handleSubmit,
     formState: { errors },
   } = useForm<HotelFormValues>({
-    resolver: zodResolver(hotelSchema),
+    resolver: zodResolver(hotelSchema) as any,
     defaultValues: {
       stars: 5,
     }
@@ -148,7 +148,7 @@ export default function NewHotelPage() {
           <Button 
             type="submit" 
             className="flex-1" 
-            isLoading={isLoading}
+            loading={isLoading}
           >
             Create Hotel
           </Button>

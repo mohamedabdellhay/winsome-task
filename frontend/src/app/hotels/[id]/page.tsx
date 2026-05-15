@@ -3,6 +3,7 @@
 import { useEffect, useState, use } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api";
+import { isStaff as checkIsStaff } from "@/lib/auth";
 import { UserLayout } from "@/components/layouts/UserLayout";
 
 interface Room {
@@ -26,6 +27,11 @@ export default function HotelDetailsPage({ params }: { params: Promise<{ id: str
   const { id } = use(params);
   const [hotel, setHotel] = useState<Hotel | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isStaff, setIsStaff] = useState(false);
+
+  useEffect(() => {
+    setIsStaff(checkIsStaff());
+  }, []);
 
   useEffect(() => {
     const fetchHotel = async () => {
@@ -139,12 +145,18 @@ export default function HotelDetailsPage({ params }: { params: Promise<{ id: str
                             <span className="text-slate-500 text-sm"> / night</span>
                           </div>
                           {room.availableCount > 0 ? (
-                            <Link 
-                              href={`/hotels/${hotel.id}/book/${room.id}`}
-                              className="w-full md:w-auto bg-brand-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-brand-primary/90 transition-all shadow-lg shadow-brand-primary/20 text-center"
-                            >
-                              Book Now
-                            </Link>
+                            !isStaff ? (
+                              <Link 
+                                href={`/hotels/${hotel.id}/book/${room.id}`}
+                                className="w-full md:w-auto bg-brand-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-brand-primary/90 transition-all shadow-lg shadow-brand-primary/20 text-center"
+                              >
+                                Book Now
+                              </Link>
+                            ) : (
+                              <span className="w-full md:w-auto bg-slate-100 text-slate-500 px-8 py-3 rounded-xl font-bold text-center text-sm">
+                                {room.availableCount} Available
+                              </span>
+                            )
                           ) : (
                             <button disabled className="w-full md:w-auto bg-slate-200 text-slate-500 px-8 py-3 rounded-xl font-bold cursor-not-allowed">
                               Sold Out

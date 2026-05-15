@@ -1,6 +1,5 @@
 import React from "react";
-
-type BookingStatus = "PENDING" | "CONFIRMED" | "CANCELLED";
+import { BookingStatus } from "@/types/booking";
 
 interface BookingCardProps {
   booking: {
@@ -93,14 +92,14 @@ export const BookingCard: React.FC<BookingCardProps> = ({ booking, onStatusUpdat
               <>
                 {isAdmin && (
                   <button
-                    onClick={() => onStatusUpdate(booking.id, "CONFIRMED")}
+                    onClick={() => onStatusUpdate(booking.id, BookingStatus.CONFIRMED)}
                     className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-lg shadow-emerald-500/20"
                   >
                     Confirm Booking
                   </button>
                 )}
                 <button
-                  onClick={() => onStatusUpdate(booking.id, "CANCELLED")}
+                  onClick={() => onStatusUpdate(booking.id, BookingStatus.CANCELLED)}
                   className="text-rose-500 hover:text-rose-600 text-sm font-bold hover:underline transition-all"
                 >
                   Cancel
