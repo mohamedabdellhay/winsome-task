@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { BookingCard } from "@/components/bookings/BookingCard";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
-import { isAdmin as checkIsAdmin } from "@/lib/auth";
+import { isStaff as checkIsStaff } from "@/lib/auth";
 import { useToast } from "@/components/ui/Toast";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { BookingStatus } from "@/types/booking";
@@ -16,7 +16,7 @@ export default function AdminBookingsPage() {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isStaff, setIsStaff] = useState(false);
   const { showToast } = useToast();
 
   // Modal state
@@ -40,7 +40,7 @@ export default function AdminBookingsPage() {
   };
 
   useEffect(() => {
-    setIsAdmin(checkIsAdmin());
+    setIsStaff(checkIsStaff());
     fetchBookings(page);
   }, [page]);
 
@@ -122,7 +122,7 @@ export default function AdminBookingsPage() {
               key={booking.id} 
               booking={booking} 
               onStatusUpdate={handleStatusUpdate}
-              isAdmin={isAdmin}
+              isStaff={isStaff}
             />
           ))}
           <Pagination

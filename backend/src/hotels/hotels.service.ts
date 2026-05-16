@@ -4,7 +4,6 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateHotelDto } from './dto/create-hotel.dto';
 import { UpdateHotelDto } from './dto/update-hotel.dto';
 
-
 @Injectable()
 export class HotelsService {
   constructor(private prisma: PrismaService) {}
@@ -28,10 +27,15 @@ export class HotelsService {
     }
 
     if (search) {
-      whereClause.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { city: { contains: search, mode: 'insensitive' } },
-      ];
+      const terms = search.trim().split(/\s+/).filter(Boolean);
+
+      whereClause.AND = terms.map((term) => ({
+        OR: [
+          { name: { contains: term, mode: 'insensitive' } },
+          { city: { contains: term, mode: 'insensitive' } },
+          { address: { contains: term, mode: 'insensitive' } },
+        ],
+      }));
     }
 
     const skip = (page - 1) * limit;
@@ -51,7 +55,7 @@ export class HotelsService {
           },
         },
       }),
-      this.prisma.hotel.count({ where: whereClause })
+      this.prisma.hotel.count({ where: whereClause }),
     ]);
 
     return {

@@ -22,10 +22,10 @@ interface BookingCardProps {
     };
   };
   onStatusUpdate?: (id: string, status: BookingStatus) => void;
-  isAdmin?: boolean;
+  isStaff?: boolean;
 }
 
-export const BookingCard: React.FC<BookingCardProps> = ({ booking, onStatusUpdate, isAdmin }) => {
+export const BookingCard: React.FC<BookingCardProps> = ({ booking, onStatusUpdate, isStaff }) => {
   const statusColors = {
     PENDING: "bg-amber-100 text-amber-700 border-amber-200",
     CONFIRMED: "bg-emerald-100 text-emerald-700 border-emerald-200",
@@ -63,7 +63,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({ booking, onStatusUpdat
           </span>
         </div>
 
-        {isAdmin && booking.user && (
+        {isStaff && booking.user && (
           <div className="mb-4 p-3 bg-slate-50 rounded-xl border border-slate-100">
             <p className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">Booked By</p>
             <p className="text-sm font-semibold text-slate-700">{booking.user.name} ({booking.user.email})</p>
@@ -90,7 +90,7 @@ export const BookingCard: React.FC<BookingCardProps> = ({ booking, onStatusUpdat
           <div className="flex gap-4">
             {booking.status === "PENDING" && onStatusUpdate && (
               <>
-                {isAdmin && (
+                {isStaff && (
                   <button
                     onClick={() => onStatusUpdate(booking.id, BookingStatus.CONFIRMED)}
                     className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-lg shadow-emerald-500/20"

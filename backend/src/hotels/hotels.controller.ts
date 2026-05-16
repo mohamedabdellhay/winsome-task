@@ -85,7 +85,7 @@ export class HotelsController {
     name: 'search',
     required: false,
     type: String,
-    description: 'Filter hotels by name or city',
+    description: 'Filter hotels by name, city, or address',
   })
   @ApiQuery({
     name: 'page',
@@ -138,7 +138,12 @@ export class HotelsController {
       const pageNumber = page ? parseInt(page, 10) : 1;
       const limitNumber = limit ? parseInt(limit, 10) : 10;
       const activeOnly = !user || user.role !== Role.ADMIN;
-      return await this.hotelsService.findAll(search, pageNumber, limitNumber, activeOnly);
+      return await this.hotelsService.findAll(
+        search,
+        pageNumber,
+        limitNumber,
+        activeOnly,
+      );
     } catch (error) {
       throw new InternalServerErrorException('Failed to fetch hotels.');
     }

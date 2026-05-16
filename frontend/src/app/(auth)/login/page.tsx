@@ -22,6 +22,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [globalError, setGlobalError] = useState<any>(null);
 
   const {
     register,
@@ -41,11 +42,19 @@ export default function LoginPage() {
       setUser(response.data.user);
       router.push("/dashboard");
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Login failed");
+      if (!err.response || err.response.status >= 500) {
+        setGlobalError(err);
+      } else {
+        setError(err?.response?.data?.message || "Login failed");
+      }
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (globalError) {
+    throw globalError;
+  }
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10">

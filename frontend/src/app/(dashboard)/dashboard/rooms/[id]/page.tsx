@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,10 +18,10 @@ const roomSchema = z.object({
 
 type RoomFormValues = z.infer<typeof roomSchema>;
 
-export default function EditRoomPage({ params }: { params: Promise<{ id: string }> }) {
+export default function EditRoomPage({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const { id } = use(params);
-  
+  const { id } = params;
+
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -73,14 +73,20 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
   };
 
   if (isLoading) {
-    return <div className="p-8 text-center text-slate-500">Loading room details...</div>;
+    return (
+      <div className="p-8 text-center text-slate-500">
+        Loading room details...
+      </div>
+    );
   }
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-brand-dark">Edit Room</h1>
-        <p className="text-slate-500 text-sm">Update pricing and availability for this room.</p>
+        <p className="text-slate-500 text-sm">
+          Update pricing and availability for this room.
+        </p>
       </div>
 
       {room && (
@@ -92,7 +98,10 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
         </div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6"
+      >
         {error && (
           <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg">
             {error}
@@ -133,19 +142,15 @@ export default function EditRoomPage({ params }: { params: Promise<{ id: string 
         </div>
 
         <div className="flex gap-3 pt-4">
-          <Button 
-            type="button" 
-            variant="secondary" 
+          <Button
+            type="button"
+            variant="secondary"
             className="flex-1"
             onClick={() => router.back()}
           >
             Cancel
           </Button>
-          <Button 
-            type="submit" 
-            className="flex-1" 
-            loading={isSubmitting}
-          >
+          <Button type="submit" className="flex-1" loading={isSubmitting}>
             Save Changes
           </Button>
         </div>

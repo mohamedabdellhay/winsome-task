@@ -46,8 +46,9 @@ describe('BookingsService', () => {
     service = module.get<BookingsService>(BookingsService);
     jest.clearAllMocks();
 
-    mockPrismaService.$transaction.mockImplementation(async (cb: (tx: typeof mockPrismaService) => unknown) =>
-      cb(mockPrismaService),
+    mockPrismaService.$transaction.mockImplementation(
+      async (cb: (tx: typeof mockPrismaService) => unknown) =>
+        cb(mockPrismaService),
     );
   });
 
@@ -72,7 +73,10 @@ describe('BookingsService', () => {
     it('should calculate total price correctly for 4 nights at 100/night', async () => {
       mockPrismaService.room.findUnique.mockResolvedValue(mockRoom);
       mockPrismaService.booking.count.mockResolvedValue(0);
-      mockPrismaService.room.update.mockResolvedValue({ ...mockRoom, availableCount: 2 });
+      mockPrismaService.room.update.mockResolvedValue({
+        ...mockRoom,
+        availableCount: 2,
+      });
       mockPrismaService.booking.create.mockResolvedValue({
         id: 'booking-1',
         totalPrice: 400,
@@ -166,10 +170,9 @@ describe('BookingsService', () => {
       );
     });
 
-    it('should decrement availableCount by 1 after successful booking', async () => {
+    it('should not mutate the room inventory count during booking creation', async () => {
       mockPrismaService.room.findUnique.mockResolvedValue(mockRoom);
       mockPrismaService.booking.count.mockResolvedValue(0);
-      mockPrismaService.room.update.mockResolvedValue({ ...mockRoom, availableCount: 2 });
       mockPrismaService.booking.create.mockResolvedValue({
         id: 'booking-1',
         status: BookingStatus.PENDING,
@@ -177,10 +180,7 @@ describe('BookingsService', () => {
 
       await service.create(baseDto, regularUser);
 
-      expect(mockPrismaService.room.update).toHaveBeenCalledWith({
-        where: { id: 'room-1' },
-        data: { availableCount: { decrement: 1 } },
-      });
+      expect(mockPrismaService.room.update).not.toHaveBeenCalled();
     });
 
     it('should create booking with status PENDING by default', async () => {
@@ -254,7 +254,6 @@ describe('BookingsService', () => {
 
     it('should update status to CANCELLED', async () => {
       mockPrismaService.booking.findUnique.mockResolvedValue(existingBooking);
-      mockPrismaService.room.update.mockResolvedValue({});
       mockPrismaService.booking.update.mockResolvedValue({
         ...existingBooking,
         status: BookingStatus.CANCELLED,
@@ -267,22 +266,7 @@ describe('BookingsService', () => {
       );
 
       expect(result.status).toBe(BookingStatus.CANCELLED);
-    });
-
-    it('should increment room availableCount when booking is CANCELLED', async () => {
-      mockPrismaService.booking.findUnique.mockResolvedValue(existingBooking);
-      mockPrismaService.room.update.mockResolvedValue({});
-      mockPrismaService.booking.update.mockResolvedValue({
-        ...existingBooking,
-        status: BookingStatus.CANCELLED,
-      });
-
-      await service.updateStatus('booking-1', BookingStatus.CANCELLED, adminUser);
-
-      expect(mockPrismaService.room.update).toHaveBeenCalledWith({
-        where: { id: 'room-1' },
-        data: { availableCount: { increment: 1 } },
-      });
+      expect(mockPrismaService.room.update).not.toHaveBeenCalled();
     });
 
     it('should throw NotFoundException if booking does not exist', async () => {
@@ -296,7 +280,9 @@ describe('BookingsService', () => {
 
   describe('findAll', () => {
     it('should return only bookings belonging to the requesting user', async () => {
-      mockPrismaService.booking.findMany.mockResolvedValue([{ id: 'b1', userId: 'user-1' }]);
+      mockPrismaService.booking.findMany.mockResolvedValue([
+        { id: 'b1', userId: 'user-1' },
+      ]);
       mockPrismaService.booking.count.mockResolvedValue(1);
 
       const result = await service.findAll(regularUser);

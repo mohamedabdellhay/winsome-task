@@ -1,11 +1,10 @@
 services:
 
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: mohamedabdellhay/winsome-task-backend:latest
     container_name: winsome_backend
     environment:
+      # Construct DATABASE_URL using variables to ensure it connects to the 'postgres' service
       DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
@@ -19,11 +18,7 @@ services:
     command: sh -c "npx prisma migrate deploy && npx prisma db seed && node dist/main"
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+    image: mohamedabdellhay/winsome-task-frontend:latest
     container_name: winsome_frontend
     ports:
       - "8080:8080"
@@ -49,3 +44,4 @@ services:
 
 volumes:
   postgres_data:
+

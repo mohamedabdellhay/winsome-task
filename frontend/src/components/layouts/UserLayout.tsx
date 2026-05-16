@@ -10,6 +10,15 @@ interface UserLayoutProps {
 export const UserLayout = async ({ children }: UserLayoutProps) => {
   const cookieStore = await cookies();
   const isAuth = cookieStore.has("auth_token");
+  const userCookie = cookieStore.get("auth_user");
+  let isUser = false;
+  
+  if (userCookie) {
+    try {
+      const user = JSON.parse(decodeURIComponent(userCookie.value));
+      isUser = user?.role === "USER";
+    } catch (e) {}
+  }
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -31,7 +40,7 @@ export const UserLayout = async ({ children }: UserLayoutProps) => {
                     Hotels
                   </Link>
                 </li>
-               {isAuth && (
+               {isAuth && isUser && (
                 <li>
                   <Link href="/bookings" className="text-sm font-medium text-slate-600 hover:text-brand-primary">
                     My Bookings

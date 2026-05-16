@@ -139,7 +139,7 @@ export default function MyBookingsPage() {
                   key={booking.id} 
                   booking={booking} 
                   onStatusUpdate={handleStatusUpdate}
-                  isAdmin={isAdmin}
+                  isStaff={false}
                 />
               ))}
               <Pagination

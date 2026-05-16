@@ -59,9 +59,14 @@ describe('HotelsService', () => {
       expect(mockPrismaService.hotel.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
-            OR: [
-              { name: { contains: 'Cairo', mode: 'insensitive' } },
-              { city: { contains: 'Cairo', mode: 'insensitive' } },
+            AND: [
+              expect.objectContaining({
+                OR: [
+                  { name: { contains: 'Cairo', mode: 'insensitive' } },
+                  { city: { contains: 'Cairo', mode: 'insensitive' } },
+                  { address: { contains: 'Cairo', mode: 'insensitive' } },
+                ],
+              }),
             ],
           }),
         }),
@@ -77,9 +82,39 @@ describe('HotelsService', () => {
       expect(mockPrismaService.hotel.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
-            OR: expect.arrayContaining([
-              { name: { contains: 'Grand', mode: 'insensitive' } },
-            ]),
+            AND: [
+              expect.objectContaining({
+                OR: expect.arrayContaining([
+                  { name: { contains: 'Grand', mode: 'insensitive' } },
+                ]),
+              }),
+            ],
+          }),
+        }),
+      );
+    });
+
+    it('should filter by address when search matches address', async () => {
+      mockPrismaService.hotel.findMany.mockResolvedValue([]);
+      mockPrismaService.hotel.count.mockResolvedValue(0);
+
+      await service.findAll('Test St', 1, 10);
+
+      expect(mockPrismaService.hotel.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            AND: [
+              expect.objectContaining({
+                OR: expect.arrayContaining([
+                  { address: { contains: 'Test', mode: 'insensitive' } },
+                ]),
+              }),
+              expect.objectContaining({
+                OR: expect.arrayContaining([
+                  { address: { contains: 'St', mode: 'insensitive' } },
+                ]),
+              }),
+            ],
           }),
         }),
       );
@@ -119,11 +154,16 @@ describe('HotelsService', () => {
         managerId: 'mgr-1',
         status: HotelStatus.ACTIVE,
       };
-      mockPrismaService.hotel.create.mockResolvedValue({ id: 'hotel-1', ...dto });
+      mockPrismaService.hotel.create.mockResolvedValue({
+        id: 'hotel-1',
+        ...dto,
+      });
 
       const result = await service.create(dto);
 
-      expect(mockPrismaService.hotel.create).toHaveBeenCalledWith({ data: dto });
+      expect(mockPrismaService.hotel.create).toHaveBeenCalledWith({
+        data: dto,
+      });
       expect(result.id).toBe('hotel-1');
       expect(result.stars).toBe(4);
     });
@@ -144,7 +184,9 @@ describe('HotelsService', () => {
     it('should throw NotFoundException if hotel does not exist', async () => {
       mockPrismaService.hotel.findUnique.mockResolvedValue(null);
 
-      await expect(service.remove('missing')).rejects.toThrow(NotFoundException);
+      await expect(service.remove('missing')).rejects.toThrow(
+        NotFoundException,
+      );
       expect(mockPrismaService.hotel.delete).not.toHaveBeenCalled();
     });
   });

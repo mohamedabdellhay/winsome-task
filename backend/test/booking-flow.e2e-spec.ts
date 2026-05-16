@@ -35,7 +35,9 @@ describe('Booking Flow (E2E)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, transform: true }),
+    );
     await app.init();
 
     prisma = moduleFixture.get<PrismaService>(PrismaService);
@@ -101,7 +103,9 @@ describe('Booking Flow (E2E)', () => {
     });
 
     it('Step 3: Login as admin', async () => {
-      const admin = await prisma.user.findFirst({ where: { role: Role.ADMIN } });
+      const admin = await prisma.user.findFirst({
+        where: { role: Role.ADMIN },
+      });
       const res = await request(app.getHttpServer())
         .post('/auth/login')
         .send({ email: admin!.email, password })
@@ -193,12 +197,12 @@ describe('Booking Flow (E2E)', () => {
       expect(res.body.data[0].id).toBe(bookingId);
     });
 
-    it('Step 10: Verify availableCount decreased by 1', async () => {
+    it('Step 10: Verify room inventory remains total capacity after reservation', async () => {
       const res = await request(app.getHttpServer())
         .get(`/rooms/${roomId}`)
         .expect(200);
 
-      expect(res.body.availableCount).toBe(1);
+      expect(res.body.availableCount).toBe(2);
     });
 
     it('Step 11: Admin confirms booking', async () => {
@@ -269,8 +273,20 @@ describe('Booking Flow (E2E)', () => {
         .send({
           hotelId,
           roomId,
-          checkIn: futureISODate(50),
-          checkOut: futureISODate(55),
+          checkIn: futureISODate(40),
+          checkOut: futureISODate(45),
+          guestCount: 1,
+        })
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .post('/bookings')
+        .set('Authorization', `Bearer ${userToken}`)
+        .send({
+          hotelId,
+          roomId,
+          checkIn: futureISODate(40),
+          checkOut: futureISODate(45),
           guestCount: 1,
         })
         .expect(400);
@@ -358,7 +374,7 @@ describe('Booking Flow (E2E)', () => {
       cancelRoomId = res.body.id;
     });
 
-    it('Step 2: User books the room — availableCount becomes 0', async () => {
+    it('Step 2: User books the room — total inventory remains unchanged', async () => {
       const res = await request(app.getHttpServer())
         .post('/bookings')
         .set('Authorization', `Bearer ${userToken}`)
@@ -377,10 +393,10 @@ describe('Booking Flow (E2E)', () => {
         .get(`/rooms/${cancelRoomId}`)
         .expect(200);
 
-      expect(roomRes.body.availableCount).toBe(0);
+      expect(roomRes.body.availableCount).toBe(1);
     });
 
-    it('Step 3: Admin cancels the booking — availableCount restored', async () => {
+    it('Step 3: Admin cancels the booking — total inventory remains unchanged', async () => {
       await request(app.getHttpServer())
         .patch(`/bookings/${cancelBookingId}/status`)
         .set('Authorization', `Bearer ${adminToken}`)

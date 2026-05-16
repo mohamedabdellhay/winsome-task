@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { api } from "@/lib/api";
@@ -25,10 +25,14 @@ interface Hotel {
   stars: number;
 }
 
-export default function BookingPage({ params }: { params: Promise<{ id: string; roomId: string }> }) {
-  const { id, roomId } = use(params);
+export default function BookingPage({
+  params,
+}: {
+  params: { id: string; roomId: string };
+}) {
+  const { id, roomId } = params;
   const router = useRouter();
-  
+
   const [hotel, setHotel] = useState<Hotel | null>(null);
   const [room, setRoom] = useState<Room | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -54,7 +58,7 @@ export default function BookingPage({ params }: { params: Promise<{ id: string; 
       try {
         const [hotelRes, roomRes] = await Promise.all([
           api.get(`/hotels/${id}`),
-          api.get(`/rooms/${roomId}`)
+          api.get(`/rooms/${roomId}`),
         ]);
         setHotel(hotelRes.data);
         setRoom(roomRes.data);
@@ -101,9 +105,9 @@ export default function BookingPage({ params }: { params: Promise<{ id: string; 
     } catch (err: any) {
       console.error("Booking submission error:", err);
       const data = err.response?.data;
-      
+
       let errorMsg = "An unexpected error occurred. Please try again.";
-      
+
       if (data) {
         if (Array.isArray(data.errors) && data.errors.length > 0) {
           errorMsg = data.errors.join(". ");
@@ -115,7 +119,7 @@ export default function BookingPage({ params }: { params: Promise<{ id: string; 
           errorMsg = data.error;
         }
       }
-      
+
       setError(errorMsg);
     } finally {
       setIsSubmitting(false);
@@ -136,8 +140,13 @@ export default function BookingPage({ params }: { params: Promise<{ id: string; 
     return (
       <>
         <div className="flex flex-col justify-center items-center h-[calc(100vh-64px)] bg-slate-50 space-y-4">
-          <h2 className="text-2xl font-bold text-slate-700">Error loading booking details</h2>
-          <Link href={`/hotels/${id}`} className="text-brand-primary hover:underline">
+          <h2 className="text-2xl font-bold text-slate-700">
+            Error loading booking details
+          </h2>
+          <Link
+            href={`/hotels/${id}`}
+            className="text-brand-primary hover:underline"
+          >
             ← Back to hotel
           </Link>
         </div>
@@ -149,8 +158,23 @@ export default function BookingPage({ params }: { params: Promise<{ id: string; 
     <>
       <div className="bg-slate-50 min-h-[calc(100vh-64px)] py-12">
         <div className="w-full mx-auto px-4">
-          <Link href={`/hotels/${id}`} className="inline-flex items-center text-slate-500 hover:text-brand-primary mb-8 transition-colors">
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+          <Link
+            href={`/hotels/${id}`}
+            className="inline-flex items-center text-slate-500 hover:text-brand-primary mb-8 transition-colors"
+          >
+            <svg
+              className="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              ></path>
+            </svg>
             Back to {hotel.name}
           </Link>
 
@@ -159,12 +183,16 @@ export default function BookingPage({ params }: { params: Promise<{ id: string; 
             <div className="lg:col-span-3">
               <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/60 overflow-hidden border border-slate-100">
                 <div className="p-8">
-                  <h1 className="text-2xl font-bold text-slate-900 mb-6">Confirm your booking</h1>
-                  
+                  <h1 className="text-2xl font-bold text-slate-900 mb-6">
+                    Confirm your booking
+                  </h1>
+
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <label className="text-sm font-semibold text-slate-700 ml-1">Check-in Date</label>
+                        <label className="text-sm font-semibold text-slate-700 ml-1">
+                          Check-in Date
+                        </label>
                         <Input
                           type="date"
                           value={checkIn}
@@ -175,36 +203,57 @@ export default function BookingPage({ params }: { params: Promise<{ id: string; 
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-semibold text-slate-700 ml-1">Check-out Date</label>
+                        <label className="text-sm font-semibold text-slate-700 ml-1">
+                          Check-out Date
+                        </label>
                         <Input
                           type="date"
                           value={checkOut}
                           onChange={(e) => setCheckOut(e.target.value)}
                           required
-                          min={checkIn || new Date().toISOString().split("T")[0]}
+                          min={
+                            checkIn || new Date().toISOString().split("T")[0]
+                          }
                           className="rounded-xl border-slate-200 focus:border-brand-primary focus:ring-brand-primary/20 h-12"
                         />
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-sm font-semibold text-slate-700 ml-1">Number of Guests</label>
+                      <label className="text-sm font-semibold text-slate-700 ml-1">
+                        Number of Guests
+                      </label>
                       <Input
                         type="number"
                         value={guestCount}
-                        onChange={(e) => setGuestCount(parseInt(e.target.value))}
+                        onChange={(e) =>
+                          setGuestCount(parseInt(e.target.value))
+                        }
                         required
                         min={1}
                         max={room.capacity}
                         className="rounded-xl border-slate-200 focus:border-brand-primary focus:ring-brand-primary/20 h-12"
                       />
-                      <p className="text-xs text-slate-400 ml-1">Maximum capacity for this room is {room.capacity} guests.</p>
+                      <p className="text-xs text-slate-400 ml-1">
+                        Maximum capacity for this room is {room.capacity}{" "}
+                        guests.
+                      </p>
                     </div>
 
                     {error && (
                       <div className="p-4 bg-rose-50 border border-rose-100 text-rose-600 rounded-2xl flex items-start gap-3 animate-in shake duration-500">
-                        <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <svg
+                          className="w-5 h-5 flex-shrink-0 mt-0.5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
                         </svg>
                         <div>
                           <p className="text-sm font-bold">Booking Error</p>
@@ -234,7 +283,9 @@ export default function BookingPage({ params }: { params: Promise<{ id: string; 
                 </div>
                 <div className="p-6 space-y-6">
                   <div>
-                    <h4 className="text-xl font-bold text-slate-900 capitalize">{room.type} Room</h4>
+                    <h4 className="text-xl font-bold text-slate-900 capitalize">
+                      {room.type} Room
+                    </h4>
                     <p className="text-slate-500 text-sm">{hotel.name}</p>
                     <div className="flex text-amber-400 text-xs mt-1">
                       {[...Array(hotel.stars)].map((_, i) => (
@@ -246,13 +297,21 @@ export default function BookingPage({ params }: { params: Promise<{ id: string; 
                   <div className="space-y-3">
                     <div className="flex justify-between text-slate-600">
                       <span>Price per night</span>
-                      <span className="font-semibold text-slate-900">${room.pricePerNight}</span>
+                      <span className="font-semibold text-slate-900">
+                        ${room.pricePerNight}
+                      </span>
                     </div>
                     {totalPrice > 0 && (
                       <div className="flex justify-between text-slate-600">
                         <span>Number of nights</span>
                         <span className="font-semibold text-slate-900">
-                          {Math.ceil(Math.abs(new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24))}
+                          {Math.ceil(
+                            Math.abs(
+                              new Date(checkOut).getTime() -
+                                new Date(checkIn).getTime(),
+                            ) /
+                              (1000 * 60 * 60 * 24),
+                          )}
                         </span>
                       </div>
                     )}
@@ -261,16 +320,31 @@ export default function BookingPage({ params }: { params: Promise<{ id: string; 
                   <hr className="border-slate-100" />
 
                   <div className="flex justify-between items-center">
-                    <span className="text-lg font-bold text-slate-900">Total Price</span>
-                    <span className="text-3xl font-extrabold text-brand-primary">${totalPrice.toFixed(2)}</span>
+                    <span className="text-lg font-bold text-slate-900">
+                      Total Price
+                    </span>
+                    <span className="text-3xl font-extrabold text-brand-primary">
+                      ${totalPrice.toFixed(2)}
+                    </span>
                   </div>
 
                   <div className="bg-emerald-50 p-4 rounded-2xl flex items-start gap-3">
-                    <svg className="w-5 h-5 text-emerald-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.286-6.857L1 12l7.714-2.143L11 3z" />
+                    <svg
+                      className="w-5 h-5 text-emerald-600 mt-0.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.286-6.857L1 12l7.714-2.143L11 3z"
+                      />
                     </svg>
                     <p className="text-xs text-emerald-800 leading-relaxed">
-                      Your booking includes complimentary breakfast and high-speed Wi-Fi.
+                      Your booking includes complimentary breakfast and
+                      high-speed Wi-Fi.
                     </p>
                   </div>
                 </div>

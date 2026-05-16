@@ -25,10 +25,10 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex h-screen overflow-hidden bg-slate-50">
       {/* Sidebar - Fixed to left for LTR, mirrored for RTL */}
-      <aside className="w-64 flex-shrink-0 border-r border-slate-200 bg-white shadow-sm">
-        <div className="flex h-16 items-center px-6 border-b border-slate-100">
+      <aside className="w-64 flex-shrink-0 border-r border-slate-200 bg-white shadow-sm flex flex-col">
+        <div className="flex h-16 items-center px-6 border-b border-slate-100 flex-shrink-0">
           <Link href="/dashboard" className="flex items-center gap-2">
             <div className="h-7 w-7 rounded bg-brand-primary flex items-center justify-center text-white font-bold text-xs">
               W
@@ -37,7 +37,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
           </Link>
         </div>
         
-        <nav className="mt-6 px-4 space-y-1">
+        <nav className="mt-6 px-4 space-y-1 flex-1 overflow-y-auto">
           <Link 
             href="/dashboard" 
             className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
@@ -69,9 +69,9 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col overflow-hidden">
         {/* Header */}
-        <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-8">
+        <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-8 flex-shrink-0">
           <h2 className="text-lg font-semibold text-brand-dark"></h2>
           <div className="flex items-center gap-4">
             <div className="flex flex-col items-end mr-2">
@@ -89,7 +89,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
         </header>
 
         {/* Page Content */}
-        <main className="p-8">
+        <main className="flex-1 overflow-y-auto p-8 bg-slate-50">
           <div className="mx-auto max-w-6xl">
             {children}
           </div>

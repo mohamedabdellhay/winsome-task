@@ -14,7 +14,9 @@ export class BookingsService {
 
   async create(createBookingDto: CreateBookingDto, user: any) {
     if (user.role === Role.HOTEL_MANAGER) {
-      throw new ForbiddenException('Hotel managers are not allowed to make bookings.');
+      throw new ForbiddenException(
+        'Hotel managers are not allowed to make bookings.',
+      );
     }
 
     const userId = user.id;
@@ -26,7 +28,9 @@ export class BookingsService {
     today.setHours(0, 0, 0, 0);
 
     if (checkInDate >= checkOutDate) {
-      throw new BadRequestException('Check-in date must be before check-out date.');
+      throw new BadRequestException(
+        'Check-in date must be before check-out date.',
+      );
     }
 
     if (checkInDate < today) {
@@ -53,7 +57,9 @@ export class BookingsService {
       }
 
       if (room.availableCount <= 0) {
-        throw new BadRequestException('Room is not available for the selected dates.');
+        throw new BadRequestException(
+          'Room is not available for the selected dates.',
+        );
       }
 
       const overlappingBookings = await tx.booking.count({
@@ -68,15 +74,12 @@ export class BookingsService {
       });
 
       if (overlappingBookings >= room.availableCount) {
-        throw new BadRequestException('Room is not available for the selected dates.');
+        throw new BadRequestException(
+          'Room is not available for the selected dates.',
+        );
       }
 
       const totalPrice = Number(room.pricePerNight) * diffDays;
-
-      await tx.room.update({
-        where: { id: roomId },
-        data: { availableCount: { decrement: 1 } },
-      });
 
       return tx.booking.create({
         data: {
@@ -143,12 +146,17 @@ export class BookingsService {
 
     if (user.role === Role.ADMIN) return booking;
 
-    if (user.role === Role.HOTEL_MANAGER && booking.hotel.managerId === user.id) {
+    if (
+      user.role === Role.HOTEL_MANAGER &&
+      booking.hotel.managerId === user.id
+    ) {
       return booking;
     }
 
     if (booking.userId !== user.id) {
-      throw new ForbiddenException('You do not have permission to view this booking.');
+      throw new ForbiddenException(
+        'You do not have permission to view this booking.',
+      );
     }
 
     return booking;
@@ -171,16 +179,6 @@ export class BookingsService {
     }
 
     return this.prisma.$transaction(async (tx) => {
-      if (
-        status === BookingStatus.CANCELLED &&
-        booking.status !== BookingStatus.CANCELLED
-      ) {
-        await tx.room.update({
-          where: { id: booking.roomId },
-          data: { availableCount: { increment: 1 } },
-        });
-      }
-
       return tx.booking.update({
         where: { id },
         data: { status },
