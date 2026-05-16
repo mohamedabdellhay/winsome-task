@@ -85,9 +85,9 @@ model Booking {
   user    User   @relation(fields: [userId], references: [id])
   userId  String
 
-  hotel   Hotel  @relation(fields: [hotelId], references: [id])
+  hotel   Hotel  @relation(fields: [hotelId], references: [id], onDelete: Cascade)
   hotelId String
 
-  room    Room   @relation(fields: [roomId], references: [id])
+  room    Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
   roomId  String
 }
