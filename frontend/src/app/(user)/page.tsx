@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 export default function HomePage() {
   return (
     <>
@@ -10,7 +12,7 @@ export default function HomePage() {
               Discover the Art of <span className="text-brand-primary">Luxury Booking</span>
             </h1>
             <p className="mt-6 text-lg leading-8 text-slate-600">
-              Experience unparalleled hospitality and world-class services at your fingertips. 
+              Experience unparalleled hospitality and world-class services at your fingertips.
               Find your perfect stay with Winsome.
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
@@ -26,8 +28,6 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-        
-        {/* Background Decorative Element */}
         <div className="absolute top-0 -z-10 h-full w-full bg-[radial-gradient(circle_at_top_right,_var(--brand-primary)_0%,_transparent_25%)] opacity-5"></div>
       </div>
     </>

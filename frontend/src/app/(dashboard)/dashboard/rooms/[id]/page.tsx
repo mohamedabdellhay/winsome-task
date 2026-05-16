@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -18,9 +18,10 @@ const roomSchema = z.object({
 
 type RoomFormValues = z.infer<typeof roomSchema>;
 
-export default function EditRoomPage({ params }: { params: { id: string } }) {
+export default function EditRoomPage() {
+  const params = useParams();
+  const id = params?.id as string;
   const router = useRouter();
-  const { id } = params;
 
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);

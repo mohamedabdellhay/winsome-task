@@ -21,7 +21,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
 
   const handleLogout = () => {
     clearToken();
-    router.push("/login");
+    router.push("/");
   };
 
   return (

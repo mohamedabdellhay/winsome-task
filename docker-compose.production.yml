@@ -3,45 +3,28 @@ services:
   backend:
     image: mohamedabdellhay/winsome-task-backend:latest
     container_name: winsome_backend
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
-      # Construct DATABASE_URL using variables to ensure it connects to the 'postgres' service
-      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@172.17.0.1:5432/${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
-      CORS_ORIGIN: ${CORS_ORIGIN:-*}
       PORT: 3001
     ports:
       - "3001:3001"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    command: sh -c "npx prisma migrate deploy && npx prisma db seed && node dist/main"
 
   frontend:
     image: mohamedabdellhay/winsome-task-frontend:latest
     container_name: winsome_frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://backend:3001
+      API_URL: http://backend:3001
     ports:
       - "8080:8080"
     depends_on:
       - backend
 
-  postgres:
-    image: postgres:15
-    container_name: hotel_db
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-volumes:
-  postgres_data:
 

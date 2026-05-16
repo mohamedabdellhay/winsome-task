@@ -1,16 +1,11 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import { api } from "@/lib/api";
-import { isStaff as checkIsStaff } from "@/lib/auth";
-import { Button } from "@/components/ui/Button";
+import { notFound } from "next/navigation";
 
 interface Room {
   id: string;
   type: string;
   capacity: number;
-  pricePerNight: string; // Decimal comes as string from API usually
+  pricePerNight: string;
   availableCount: number;
 }
 
@@ -23,119 +18,43 @@ interface Hotel {
   rooms: Room[];
 }
 
-export default function HotelDetailsPage({
+const API_BASE_URL =
+  (process.env.API_URL || process.env.NEXT_PUBLIC_API_URL)?.replace(/\/$/, "") ??
+  "http://localhost:3001";
+
+async function fetchHotel(id: string): Promise<Hotel> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/hotels/${id}`, {
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    if (response.status === 404) {
+      notFound();
+    }
+    throw new Error(`Failed to fetch hotel details: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export const dynamic = "force-dynamic";
+
+type HotelDetailsParams = {
+  id: string;
+};
+
+export default async function HotelDetailsPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<HotelDetailsParams> | HotelDetailsParams;
 }) {
-  const { id } = params;
-  const [hotel, setHotel] = useState<Hotel | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isStaff, setIsStaff] = useState(false);
-  const [error, setError] = useState<any>(null);
-  const [hotelNotFound, setHotelNotFound] = useState(false);
-
-  useEffect(() => {
-    setIsStaff(checkIsStaff());
-  }, []);
-
-  useEffect(() => {
-    const fetchHotel = async () => {
-      try {
-        const response = await api.get(`/hotels/${id}`);
-        setHotel(response.data);
-      } catch (err: any) {
-        console.error("Failed to fetch hotel details:", err);
-        if (err.response?.status === 404) {
-          setHotelNotFound(true);
-        } else {
-          setError(err);
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchHotel();
-  }, [id]);
-
-  if (error) {
-    throw error;
-  }
-
-  if (hotelNotFound) {
-    return (
-      <div className="flex flex-col justify-center items-center h-[calc(100vh-64px)] bg-slate-50 p-6">
-        <div className="max-w-xl w-full rounded-3xl bg-white border border-slate-200 p-10 text-center shadow-xl">
-          <h2 className="text-3xl font-bold text-slate-900 mb-3">
-            Hotel not found
-          </h2>
-          <p className="text-slate-500 mb-8">
-            The hotel you're looking for does not exist or is unavailable.
-          </p>
-          <Link
-            href="/hotels"
-            className="inline-flex items-center justify-center rounded-full bg-brand-primary px-6 py-3 text-white font-semibold hover:bg-brand-primary/90 transition-colors"
-          >
-            Browse Hotels
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <>
-        <div className="flex justify-center items-center h-[calc(100vh-64px)] bg-slate-50">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"></div>
-        </div>
-      </>
-    );
-  }
-
-  if (!hotel) {
-    return (
-      <div className="flex flex-col justify-center items-center h-[calc(100vh-64px)] bg-[var(--bg-main)] p-6">
-        <div className="glass-card max-w-lg w-full p-12 text-center rounded-2xl shadow-xl animate-zoom-in">
-          <div className="w-20 h-20 bg-brand-primary/10 rounded-full mx-auto flex items-center justify-center mb-6">
-            <svg
-              className="w-10 h-10 text-brand-primary"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-              />
-            </svg>
-          </div>
-          <h2 className="text-3xl font-bold text-brand-dark mb-4">
-            Hotel Not Found
-          </h2>
-          <p className="text-slate-600 mb-8 leading-relaxed">
-            The hotel you are looking for might have been removed or the ID is
-            incorrect. We invite you to explore our other premium properties.
-          </p>
-          <Link href="/hotels" passHref>
-            <Button variant="primary" className="w-full py-4 text-lg">
-              Explore Other Hotels
-            </Button>
-          </Link>
-        </div>
-      </div>
-    );
-  }
+  const resolvedParams = await params;
+  const hotel = await fetchHotel(resolvedParams.id);
 
   return (
     <>
       <div className="bg-slate-50 min-h-[calc(100vh-64px)] pb-20">
-        {/* Hero Section */}
         <div className="relative h-96 bg-slate-800 text-white overflow-hidden">
-          {/* Placeholder for actual image */}
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent z-10"></div>
           <div className="absolute bottom-0 left-0 w-full z-20 px-4 sm:px-6 lg:px-8 pb-12 pt-32 max-w-7xl mx-auto">
             <Link
@@ -182,10 +101,8 @@ export default function HotelDetailsPage({
           </div>
         </div>
 
-        {/* Content Section */}
         <div className="w-full mx-auto px-1 sm:px-6 lg:px-8 mt-12">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            {/* Left Column - Details */}
             <div className="lg:col-span-2 space-y-10">
               <section>
                 <h2 className="text-2xl font-bold text-slate-900 mb-4">
@@ -262,24 +179,15 @@ export default function HotelDetailsPage({
                             <span className="text-2xl font-bold text-brand-dark">
                               ${room.pricePerNight}
                             </span>
-                            <span className="text-slate-500 text-sm">
-                              {" "}
-                              / night
-                            </span>
+                            <span className="text-slate-500 text-sm"> / night</span>
                           </div>
                           {room.availableCount > 0 ? (
-                            !isStaff ? (
-                              <Link
-                                href={`/hotels/${hotel.id}/book/${room.id}`}
-                                className="w-full md:w-auto bg-brand-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-brand-primary/90 transition-all shadow-lg shadow-brand-primary/20 text-center"
-                              >
-                                Book Now
-                              </Link>
-                            ) : (
-                              <span className="w-full md:w-auto bg-slate-100 text-slate-500 px-8 py-3 rounded-xl font-bold text-center text-sm">
-                                {room.availableCount} Available
-                              </span>
-                            )
+                            <Link
+                              href={`/hotels/${hotel.id}/book/${room.id}`}
+                              className="w-full md:w-auto bg-brand-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-brand-primary/90 transition-all shadow-lg shadow-brand-primary/20 text-center"
+                            >
+                              Book Now
+                            </Link>
                           ) : (
                             <button
                               disabled
@@ -296,7 +204,6 @@ export default function HotelDetailsPage({
               </section>
             </div>
 
-            {/* Right Column - Booking Summary / Sidebar */}
             <div className="lg:col-span-1">
               <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm sticky top-24">
                 <h3 className="text-lg font-bold text-slate-900 mb-4">

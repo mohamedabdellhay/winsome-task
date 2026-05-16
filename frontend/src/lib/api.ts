@@ -2,7 +2,7 @@ import axios, { AxiosError } from "axios";
 import { getToken, clearToken } from "./auth";
 
 const getBaseURL = () => {
-  const envUrl = process.env.NEXT_PUBLIC_API_URL;
+  const envUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL;
 
   let baseUrl = envUrl && envUrl !== "undefined" ? envUrl : "http://localhost:3001";
 

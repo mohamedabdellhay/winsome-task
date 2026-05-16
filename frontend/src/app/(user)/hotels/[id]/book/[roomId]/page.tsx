@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { getUser } from "@/lib/auth";
@@ -25,12 +25,10 @@ interface Hotel {
   stars: number;
 }
 
-export default function BookingPage({
-  params,
-}: {
-  params: { id: string; roomId: string };
-}) {
-  const { id, roomId } = params;
+export default function BookingPage() {
+  const params = useParams();
+  const id = params?.id as string;
+  const roomId = params?.roomId as string;
   const router = useRouter();
 
   const [hotel, setHotel] = useState<Hotel | null>(null);
@@ -90,8 +88,27 @@ export default function BookingPage({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
     setError(null);
+
+    if (!checkIn || !checkOut) {
+      setError("Please select both check-in and check-out dates.");
+      return;
+    }
+
+    const maxGuests = room?.capacity ?? 999;
+    if (Number.isNaN(guestCount) || guestCount < 1 || guestCount > maxGuests) {
+      setError("Please enter a valid number of guests.");
+      return;
+    }
+
+    const start = new Date(checkIn);
+    const end = new Date(checkOut);
+    if (!(end > start)) {
+      setError("Check-out must be after check-in.");
+      return;
+    }
+
+    setIsSubmitting(true);
 
     try {
       await api.post("/bookings", {
@@ -225,10 +242,11 @@ export default function BookingPage({
                       </label>
                       <Input
                         type="number"
-                        value={guestCount}
-                        onChange={(e) =>
-                          setGuestCount(parseInt(e.target.value))
-                        }
+                        value={Number.isNaN(guestCount) ? 1 : guestCount}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value, 10);
+                          setGuestCount(Number.isNaN(value) ? 1 : value);
+                        }}
                         required
                         min={1}
                         max={room.capacity}

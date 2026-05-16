@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -28,9 +28,10 @@ interface Manager {
   email: string;
 }
 
-export default function EditHotelPage({ params }: { params: { id: string } }) {
+export default function EditHotelPage() {
+  const params = useParams();
+  const id = params?.id as string;
   const router = useRouter();
-  const { id } = params;
 
   const [managers, setManagers] = useState<Manager[]>([]);
   const [error, setError] = useState<string | null>(null);

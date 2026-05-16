@@ -19,7 +19,7 @@ export const UserNavbar = () => {
     clearToken();
     setIsAuth(false);
     setStaff(false);
-    router.push("/login");
+    router.push("/");
   };
 
   return (
