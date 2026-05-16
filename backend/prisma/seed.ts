@@ -1,6 +1,8 @@
-import { PrismaClient, Role, BookingStatus, User } from '@prisma/client';
+import * as pkg from '@prisma/client';
+import type { User } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 
+const { PrismaClient, Role, BookingStatus } = pkg;
 const prisma = new PrismaClient();
 
 async function main() {
