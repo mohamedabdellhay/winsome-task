@@ -2,13 +2,21 @@
 
 A production-style hotel booking system built with **NestJS**, **PostgreSQL**, **Prisma**, and **JWT** on the backend, and **Next.js** with **Tailwind CSS** on the frontend.
 
+## 🔑 Test Credentials
+
+| Role  | Email                  | Password |
+|-------|------------------------|----------|
+| Admin | abdellhay@example.com  | password |
+
+---
+
 ## Live Demo
 
-| Service  | URL                                |
-| -------- | ---------------------------------- |
-| Frontend | http://46.224.39.106:8080          |
-| Backend  | http://46.224.39.106:3001          |
-| Swagger  | http://46.224.39.106:3001/api/docs |
+| Service   | URL                                          |
+|-----------|----------------------------------------------|
+| Frontend  | http://46.224.39.106:8080                    |
+| Backend   | http://46.224.39.106:3001                    |
+| Swagger   | http://46.224.39.106:3001/api/docs           |
 
 ---
 
@@ -69,7 +77,7 @@ Winsome-task/
 
 ## Prerequisites
 
-- Node.js 22
+- Node.js 20+
 - pnpm
 - Docker & Docker Compose
 
@@ -80,7 +88,7 @@ Winsome-task/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/mohamedabdellhay/winsome-task winsome-task
+git clone <repo-url> winsome-task
 cd winsome-task
 ```
 
@@ -98,11 +106,11 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
-| Service  | URL                            |
-| -------- | ------------------------------ |
-| Frontend | http://localhost:8080          |
-| Backend  | http://localhost:3001          |
-| Swagger  | http://localhost:3001/api/docs |
+| Service   | URL                              |
+|-----------|----------------------------------|
+| Frontend  | http://localhost:8080            |
+| Backend   | http://localhost:3001            |
+| Swagger   | http://localhost:3001/api/docs   |
 
 ### Use prebuilt Docker Hub images
 
@@ -112,7 +120,6 @@ docker compose -f docker-compose.production.yml up -d
 ```
 
 Pulls:
-
 - `mohamedabdellhay/winsome-task-backend:latest`
 - `mohamedabdellhay/winsome-task-frontend:latest`
 
@@ -142,30 +149,16 @@ pnpm run dev
 
 ---
 
-## Seed / Default Accounts
-
-After running `pnpm prisma db seed`, the following accounts are available:
-
-| Role          | Email               | Password     |
-| ------------- | ------------------- | ------------ |
-| Admin         | admin@winsome.com   | Admin1234!   |
-| Hotel Manager | manager@winsome.com | Manager1234! |
-| User          | user@winsome.com    | User1234!    |
-
-> These are for local development only. Change all credentials before deploying.
-
----
-
 ## Role Permissions
 
-| Action                       | Admin | Hotel Manager | User |
-| ---------------------------- | :---: | :-----------: | :--: |
-| Create / Edit / Delete hotel |  ✅   |      ❌       |  ❌  |
-| Add / Edit rooms             |  ❌   |      ✅       |  ❌  |
-| Create booking               |  ❌   |      ❌       |  ✅  |
-| View own bookings            |  ✅   |      ✅       |  ✅  |
-| Confirm / Cancel booking     |  ✅   |      ❌       |  ❌  |
-| View dashboard stats         |  ✅   |      ❌       |  ❌  |
+| Action                     | Admin | Hotel Manager | User |
+|----------------------------|:-----:|:-------------:|:----:|
+| Create / Edit / Delete hotel | ✅   | ❌            | ❌  |
+| Add / Edit rooms            | ❌   | ✅            | ❌  |
+| Create booking              | ❌   | ❌            | ✅  |
+| View own bookings           | ✅   | ✅            | ✅  |
+| Confirm / Cancel booking    | ✅   | ❌            | ❌  |
+| View dashboard stats        | ✅   | ❌            | ❌  |
 
 ---
 
@@ -173,21 +166,21 @@ After running `pnpm prisma db seed`, the following accounts are available:
 
 Full docs available at `http://localhost:3001/api/docs` (Swagger UI).
 
-| Method | Endpoint             | Auth    | Description               |
-| ------ | -------------------- | ------- | ------------------------- |
-| POST   | /auth/register       | Public  | Register new user         |
-| POST   | /auth/login          | Public  | Login and get JWT token   |
-| GET    | /hotels              | Public  | List hotels (search/page) |
-| POST   | /hotels              | Admin   | Create hotel              |
-| PATCH  | /hotels/:id          | Admin   | Update hotel              |
-| DELETE | /hotels/:id          | Admin   | Delete hotel              |
-| GET    | /rooms               | JWT     | List rooms by hotel       |
-| POST   | /rooms               | Manager | Add room to hotel         |
-| PATCH  | /rooms/:id           | Manager | Update room               |
-| POST   | /bookings            | User    | Create booking            |
-| GET    | /bookings            | JWT     | Get bookings              |
-| PATCH  | /bookings/:id/status | Admin   | Update booking status     |
-| GET    | /dashboard/stats     | Admin   | Get dashboard stats       |
+| Method | Endpoint                    | Auth      | Description              |
+|--------|-----------------------------|-----------|--------------------------|
+| POST   | /auth/register              | Public    | Register new user        |
+| POST   | /auth/login                 | Public    | Login and get JWT token  |
+| GET    | /hotels                     | Public    | List hotels (search/page)|
+| POST   | /hotels                     | Admin     | Create hotel             |
+| PATCH  | /hotels/:id                 | Admin     | Update hotel             |
+| DELETE | /hotels/:id                 | Admin     | Delete hotel             |
+| GET    | /rooms                      | JWT       | List rooms by hotel      |
+| POST   | /rooms                      | Manager   | Add room to hotel        |
+| PATCH  | /rooms/:id                  | Manager   | Update room              |
+| POST   | /bookings                   | User      | Create booking           |
+| GET    | /bookings                   | JWT       | Get bookings             |
+| PATCH  | /bookings/:id/status        | Admin     | Update booking status    |
+| GET    | /dashboard/stats            | Admin     | Get dashboard stats      |
 
 ---
 
@@ -241,23 +234,23 @@ NEXT_PUBLIC_API_URL=http://localhost:3001
 
 ## Troubleshooting
 
-| Problem                  | Solution                                                                               |
-| ------------------------ | -------------------------------------------------------------------------------------- |
-| Prisma migration fails   | Make sure the PostgreSQL container is running and `DATABASE_URL` is correct            |
+| Problem | Solution |
+|--------|----------|
+| Prisma migration fails | Make sure the PostgreSQL container is running and `DATABASE_URL` is correct |
 | Frontend can't reach API | Check that `NEXT_PUBLIC_API_URL=http://localhost:3001` is set in `frontend/.env.local` |
-| Port already in use      | Run `docker compose down` then retry, or change ports in `.env`                        |
-| Docker build fails       | Run `docker compose down -v` to clear volumes, then `docker compose up --build`        |
+| Port already in use | Run `docker compose down` then retry, or change ports in `.env` |
+| Docker build fails | Run `docker compose down -v` to clear volumes, then `docker compose up --build` |
 
 ---
 
 ## Tech Stack
 
-| Layer    | Technology                        |
-| -------- | --------------------------------- |
-| Backend  | NestJS, TypeScript, Prisma        |
-| Database | PostgreSQL                        |
-| Auth     | JWT, bcrypt, Role-based guards    |
-| Frontend | Next.js, TypeScript, Tailwind CSS |
-| Forms    | React Hook Form, Zod              |
-| Docs     | Swagger / OpenAPI                 |
-| DevOps   | Docker, Docker Compose            |
+| Layer     | Technology                        |
+|-----------|-----------------------------------|
+| Backend   | NestJS, TypeScript, Prisma        |
+| Database  | PostgreSQL                        |
+| Auth      | JWT, bcrypt, Role-based guards    |
+| Frontend  | Next.js, TypeScript, Tailwind CSS |
+| Forms     | React Hook Form, Zod              |
+| Docs      | Swagger / OpenAPI                 |
+| DevOps    | Docker, Docker Compose            |
