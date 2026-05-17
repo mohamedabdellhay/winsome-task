@@ -2,7 +2,7 @@
 
 A production-style hotel booking system built with **NestJS**, **PostgreSQL**, **Prisma**, and **JWT** on the backend, and **Next.js** with **Tailwind CSS** on the frontend.
 
-## 🔑 Test Credentials
+## Test Credentials
 
 | Role  | Email                  | Password |
 |-------|------------------------|----------|
